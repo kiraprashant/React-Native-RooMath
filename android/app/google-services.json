@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "531970054674",
+    "project_id": "roomathv4",
+    "storage_bucket": "roomathv4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:531970054674:android:120809eb6560c726ca16cb",
+        "android_client_info": {
+          "package_name": "com.roomath"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "531970054674-rtrrrgcsu8bktjq6s85omr1i10nkndte.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDiE-ICiJEPns1xW_KSD4gKFotT2VFwaA4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "531970054674-rtrrrgcsu8bktjq6s85omr1i10nkndte.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
