@@ -20,4 +20,4 @@ const MainApp = () => {
 
 };
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => MainApp);

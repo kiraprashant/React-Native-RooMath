@@ -31,6 +31,7 @@ import FutureExpense from './src/Screen/SubScreen/PlannerScreen/FutureExpense';
 import Splits from './src/Screen/SubScreen/PlannerScreen/Splits';
 import TransactionDetails from './src/Screen/SubScreen/HomeScreen.js/TransactionDetails';
 import ManageTags from './src/Screen/SubScreen/HomeScreen.js/ManageTags';
+import NewTags from './src/Screen/SubScreen/HomeScreen.js/NewTags';
 
 function App() {
   const Stack = createStackNavigator();
@@ -100,6 +101,11 @@ function App() {
             <Stack.Screen
               name="ManageTags"
               component={ManageTags}
+              options={{headerShown: false, animation: 'slide_from_right'}}
+            />
+              <Stack.Screen
+              name="NewTags"
+              component={NewTags}
               options={{headerShown: false, animation: 'slide_from_right'}}
             />
 
