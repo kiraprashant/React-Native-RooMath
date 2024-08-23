@@ -32,6 +32,8 @@ import Splits from './src/Screen/SubScreen/PlannerScreen/Splits';
 import TransactionDetails from './src/Screen/SubScreen/HomeScreen.js/TransactionDetails';
 import ManageTags from './src/Screen/SubScreen/HomeScreen.js/ManageTags';
 import NewTags from './src/Screen/SubScreen/HomeScreen.js/NewTags';
+import AnimationSplashScreen from './src/Screen/Splash/AnimationSplashScreen';
+import SMSScreen from './src/Screen/OnboardingScreen/SMSScreen';
 
 function App() {
   const Stack = createStackNavigator();
@@ -39,12 +41,22 @@ function App() {
   return (
     <SafeAreaView style={styles.container}>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="TabNavigation">
+        <Stack.Navigator initialRouteName="AnimationSplashScreen">
+        
+          <Stack.Screen
+            name="AnimationSplashScreen"
+            component={AnimationSplashScreen}
+            options={{headerShown: false}}
+          />
           <Stack.Screen
             name="Login"
             component={Login}
             options={{headerShown: false}}
-          
+          />
+            <Stack.Screen
+            name="SMSScreen"
+            component={SMSScreen}
+            options={{headerShown: false}}
           />
           <Stack.Screen
             name="OnIncome"

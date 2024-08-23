@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState,useEffect} from 'react';
 import {Text, View, TouchableOpacity, TextInput} from 'react-native';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import Lightcolors from '../../../Utli/LightMode';
@@ -6,11 +6,22 @@ import {useNavigation,useRoute} from '@react-navigation/native';
 import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
 import IconColor from '../../../Utli/IconColor';
 import ExistingTagsList from '../../../ReuseCmp/ExistingTagsList';
+import { useSelector,useDispatch } from 'react-redux';
+
 
 const ManageTags = () => {
   const Navigation = useNavigation();
+  const Dispatch = useDispatch()
   const Route = useRoute()
+  const getIcon = useSelector((state) => state.IconRedux.AllExistingIcon)
+  const userIcon = useSelector((state) => state.IconRedux.SelectedIconRedux)
+  const [ExistingIcon,setExistingIcon] = useState(getIcon)
 
+useEffect(()=>{
+  setExistingIcon(getIcon)
+},[getIcon])
+ 
+  console.log(".......//////..........." , ExistingIcon)
 
   return (
     <View style={{flex: 1, backgroundColor: '#fcfdff'}}>
@@ -50,9 +61,11 @@ const ManageTags = () => {
         <View
           style={{borderWidth: 1, borderColor: '#D8D8D8', borderRadius: 16}}>
 
-           <ExistingTagsList />
-           <ExistingTagsList /> 
-           <ExistingTagsList />
+            {
+              ExistingIcon.map((elem,i) => <ExistingTagsList key = {i} data = {elem} CheckingIcon = {userIcon}/>)
+            }
+
+    
 
         </View>
       </View>

@@ -11,14 +11,14 @@ const PlannerSlices = createSlice({
     },
     reducers:{
         ReduxAddEssentenail(state,action){
-          state.EssentenailSlice = [action.payload]
+          state.EssentenailSlice = action.payload
         },
         ReduxAddIncome(state,action){
-            state.IncomeSlice = [action.payload]
+            state.IncomeSlice = action.payload
           },
           ReduxAddSaving(state,action){
             state.SavingSlice = action.payload
-            console.log("Redux Array............ " ,state.SavingSlice )
+         
           },
           ReduxSavingDelete(state,action){
             const DeleteById = action.payload.id;     

@@ -11,23 +11,38 @@ import FocusSVG from '../../assets/Images/Focus.svg';
 import NotFocusSVG from '../../assets/Images/notFocus.svg';
 import TipSVG from '../../assets/Images/Tip.svg';
 import uuid from 'react-native-uuid';
+import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
+import { useSelector,useDispatch } from 'react-redux';
+import { ReduxAddEssentenail,ReduxAddSaving } from '../../Redux/Slices/PlannerSlices';
+import { PlannerSaveToLocal } from '../LocalStorage/LocalStorage';
 
 const OnEssentials = () => {
   const [fields, setFields] = useState([]);
+  const GetEssentials = useSelector((state) => state.Planner.EssentenailSlice) 
   const Navigation = useNavigation()
+  const Dispatch = useDispatch()
 
   useEffect(() => {
-    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false};
-    setFields([...fields, newField]);
-  }, []);
+    if(GetEssentials.length > 0){
+      setFields(GetEssentials)
+    }
+   else {
+      console.log("Nope i dont have GetEssentials")
+      const newField = {id:uuid.v4(), name: '', price: '',DeleteBtn:false,Budget:"Essentail"};
+      setFields([...fields, newField]);
+    }
+  }, [GetEssentials]);
 
   const NewScreen = () =>{
+    const SaveData = fields.filter((elem)=> elem.DeleteBtn === true )
+    Dispatch(ReduxAddEssentenail(SaveData))
+    PlannerSaveToLocal("LocalEssentials",SaveData)
     Navigation.navigate("OnSaving")
   }
 
   const addField = () => {
-    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false};
+    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false,Budget:"Saving"};
     setFields([...fields, newField]);
     console.log(fields);
   };
@@ -63,7 +78,7 @@ const OnEssentials = () => {
           justifyContent: 'space-between',
           padding: 20,
         }}>
-        <Text>Back</Text>
+        <TouchableOpacity onPress={()=> Navigation.goBack()}><Text>Back</Text></TouchableOpacity>
         <Text style={{color: LightMode.Primary, fontFamily: 'Roboto-Medium'}}>
           Skip
         </Text>
@@ -142,11 +157,16 @@ const OnEssentials = () => {
                 justifyContent: 'space-between',
                 paddingHorizontal: 16,
               }}>
-              <TextInput
-                value={elem.name}
-                onChangeText={text => handleFieldChange(i, 'name', text)}
-                placeholder="Type Here"
-              />
+              <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
+                <TouchableOpacity onPress={() => console.log('noob')}>
+                  <IconMC name="minus-circle" color={elem.DeleteBtn?"#a50000":"#f3bebe"} size={18} />
+                </TouchableOpacity>
+                <TextInput
+                  value={elem.name}
+                  onChangeText={text => handleFieldChange(i, 'name', text)}
+                  placeholder="Type Here"
+                />
+              </View>
               <View
                 style={{
                   flexDirection: 'row',

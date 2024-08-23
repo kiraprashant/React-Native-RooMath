@@ -8,12 +8,15 @@ import {useNavigation} from '@react-navigation/native';
 import SelectIconColorList from '../../../ReuseCmp/SelectIconColorList';
 import AllIconList from '../../../ReuseCmp/AllIconList';
 import { useSelector,useDispatch } from 'react-redux';
-import { CreatedIconFunction } from '../../../Redux/Slices/CreatedIconSlices';
+// import { CreatedIconFunction } from '../../../Redux/Slices/CreatedIconSlices';
+import { CreatedIconFunction } from '../../../Redux/Slices/IconSlices';
+import uuid from 'react-native-uuid';
+import { SavetoLocalStorage } from '../../LocalStorage/LocalStorage';
 
 const NewTags = () => {
   const Navigation = useNavigation();
   const Dispatch = useDispatch()
-  const getIcon = useSelector((state) => state.CreatedIcon.AllExistingIcon)
+  const getIcon = useSelector((state) => state.IconRedux.AllExistingIcon)
 
   const [NewTagName,setNewTagName] = useState()
   const [NewIconTextColor,setNewIconTextColor] = useState()
@@ -35,12 +38,19 @@ const NewTags = () => {
 
   const SaveIcon = () =>{
     const data = {
-      NewTagName:NewTagName,
-      NewIconTextColor:NewIconTextColor,
-      NewIconBGColor:NewIconBGColor,
-      NewIcon:NewIcon
+      id:uuid.v4(),
+      // NewTagName:NewTagName,
+      // NewIconTextColor:NewIconTextColor,
+      // NewIconBGColor:NewIconBGColor,
+      // NewIcon:NewIcon
+
+      Name:NewTagName,
+      TextColor:NewIconTextColor,
+      BackgroundColor:NewIconBGColor,
+      IconName:NewIcon
     }
     console.log("data ",data)
+    SavetoLocalStorage("ManageTags",data)
     Dispatch(CreatedIconFunction(data))
 
     setNewTagName("")
@@ -95,6 +105,7 @@ const NewTags = () => {
     'food-outline',
     'shield-outline',
     'calendar-outline',
+    'map-marker-outline',
     'phone-outline',
     'wrench-outline',
     'credit-card-outline',

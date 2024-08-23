@@ -1,15 +1,16 @@
 import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import {Text, Touchable, TouchableOpacity, View} from 'react-native';
 import ProgressBar from '../Screen/CustomCarts/ProgressBar';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 
 const Card = ({
-  DailySpend,
-  MontlySpend,
+  ActualSpend,
+  PlannedSpend,
   actualColor,
   Name,
   Description,
   Icon,
+  functionName
 }) => {
   return (
     <View>
@@ -28,6 +29,7 @@ const Card = ({
           <Text style={{fontSize: 10, textAlign: 'center'}}>{Description}</Text>
         </View>
       ) : (
+       <TouchableOpacity onPress={()=> functionName()}>
         <View
           style={{
             flex:1,
@@ -44,16 +46,17 @@ const Card = ({
             <Text style={{fontSize: 12}}>{Description}</Text>
             <View style={{marginTop: 'auto'}}>
               <Text style={{fontSize: 14}}>
-                ₹ {DailySpend.toFixed()} / ₹ {MontlySpend.toFixed()}
+                ₹ {ActualSpend} / ₹ {PlannedSpend}
               </Text>
               <ProgressBar
-                actual={DailySpend} // Actual progress value (percentage)
-                expected={MontlySpend} // Expected progress value (percentage)
+                actual={ActualSpend} // Actual progress value (percentage)
+                expected={PlannedSpend} // Expected progress value (percentage)
                 height={5} // Height of the progress bar
                 actualColor={actualColor} // Fill color for the actual value
               />
             </View>
           </View>
+          </TouchableOpacity>
     
       )}
     </View>

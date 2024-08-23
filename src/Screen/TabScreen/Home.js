@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {Text, TouchableOpacity, View, FlatList, ScrollView} from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DonutChart from '../CustomCarts/DonuntChart';
 import Lightcolors from '../../Utli/LightMode';
@@ -9,10 +10,29 @@ import IconM from 'react-native-vector-icons/MaterialIcons';
 import List from '../../ReuseCmp/List';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import Essential from '../SubScreen/PlannedVsActual/Essential';
+import Saving from '../SubScreen/PlannedVsActual/Saving';
+import { useSelector,useDispatch } from 'react-redux';
 
 const Home = () => {
-
+  const Dispatch = useDispatch()
   const Navigation = useNavigation()
+  const getSMSData = useSelector((state) => state.SMS.SMSDATA)
+  const GetEssential = useSelector((state) => state.Planner.EssentenailSlice)
+  const GetSaving = useSelector((state) => state.Planner.SavingSlice)
+  const GetIncome = useSelector((state) => state.Planner.IncomeSlice)
+
+
+  // useEffect(() =>{
+  //    console.log("getSMSData////////////// State wala",StateSMS)
+  // },[getSMSData])
+
+
+  console.log("//////////////////////////",GetEssential)
+
+  const [OpenEssentialModal, setOpenEssentialModal] = useState(false);  
+  const [OpenSavingModal, setOpenSavingModal] = useState(false);  
+  const [StateSMS,setStateSMS] = useState(getSMSData)
 
   const [StateSpendAmount, setStateSpendAmount] = useState(600);
   const [StateTotalAmount, setStateTotalAmount] = useState(1000);
@@ -24,8 +44,58 @@ const Home = () => {
   const [MontlySpend, setMontlySpend] = useState(10);
   const [DailySpend, setDailySpend] = useState(20);
 
-  const [actual, setActual] = useState(33500);
-  const [expected, setExpected] = useState(45000);
+  const [PlannedEssentenail, setPlannedEssentenail] = useState(33500);
+  const [ActualEssentenail, setActualEssentenail] = useState(45000);
+
+  const [PlannedSaving,setPlannedSaving] = useState()
+  const [ActualSaving,setActualSaving] = useState()
+
+
+  useEffect(() => {
+
+    SplashScreen.hide();
+  },[])
+
+  useEffect(() => {
+  const getActualEssentail =  getSMSData.reduce((acc,elem) =>{
+     if(elem.Budget === "Essentail"){
+      console.log(".........../getting here")
+     return  acc + elem.RS
+     }
+     else{
+      return acc
+     }
+    },0)
+
+    console.log("/////////////////////////////",getActualEssentail)
+
+    const getActualSaving =  getSMSData.reduce((acc,elem) =>{
+      if(elem.Budget === "Saving"){
+      return  acc+elem.RS
+      }
+      else{
+       return acc
+      }
+     },1000)
+
+     setActualEssentenail(getActualEssentail)
+     setActualSaving(getActualSaving)
+
+  },[getSMSData])
+
+  
+
+  useEffect(() =>{
+    const SavingPrice = GetSaving.reduce((acc,elem)=> acc + parseInt(elem.price),0)
+    console.log(SavingPrice)
+    setPlannedSaving(SavingPrice)
+  },[GetSaving])
+
+  useEffect(() =>{
+    const EssentialPrice = GetEssential.reduce((acc,elem)=> acc + parseInt(elem.price),0)
+    console.log(EssentialPrice)
+    setPlannedEssentenail(EssentialPrice)
+  },[GetEssential])
 
   const data = [
     {
@@ -39,34 +109,39 @@ const Home = () => {
     // Add more data objects as needed
   ];
 
+  const Essentialmodalfunction = () =>{
+    setOpenEssentialModal(!OpenEssentialModal)
+  }
+
+  const Savingmodalfunction = () =>{
+    setOpenSavingModal(!OpenSavingModal)
+  }
+
+
   const PlannerData = [
     {
       Icon: 'Star',
       Name: 'Planned vs Actual',
       Description: 'You are on the right track. Good Job!!!',
-      DailySpend: 40,
-      MonthlySpend: 100,
+      ActualSpend: 40,
+      PlannedSpend: 100,
+      functionName:()=> modalfunction()
     },
     {
       Name: 'Expense',
       Description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla elit magna, molestie in finibus.',
-      DailySpend: 40,
-      MonthlySpend: 100,
+      ActualSpend: ActualEssentenail,
+      PlannedSpend: PlannedEssentenail,
+      functionName:()=> Essentialmodalfunction()
     },
     {
       Name: 'Saving',
       Description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla elit magna, molestie in finibus.',
-      DailySpend: 60,
-      MonthlySpend: 100,
-    },
-    {
-      Name: 'Income',
-      Description:
-        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla elit magna, molestie in finibus.',
-      DailySpend: 40,
-      MonthlySpend: 120,
+      ActualSpend: ActualSaving,
+      PlannedSpend: PlannedSaving,
+      functionName:()=> Savingmodalfunction()
     },
   ];
 
@@ -82,10 +157,11 @@ const Home = () => {
     console.log(StateSpendAmount);
   };
 
+
   return (
     <View style={{flex: 1, backgroundColor: '#fcfdff'}}>
       <View style={{position: 'absolute', bottom: 20, right: 20, zIndex: 100}}>
-        <TouchableOpacity onPress={()=> Navigation.push("TransactionDetails")}>
+        <TouchableOpacity onPress={()=> Navigation.push("TransactionDetails",{isUpdate: false})}>
           <IconM
             name="add"
             size={48}
@@ -185,10 +261,11 @@ const Home = () => {
                     Name={item.Name}
                     Description={item.Description}
                     Icon={item.Icon}
-                    DailySpend={item.DailySpend}
-                    MontlySpend={item.MonthlySpend}
+                    ActualSpend={item.ActualSpend}
+                    PlannedSpend={item.PlannedSpend}
                     actualColor="#809AC0"
                     height={5}
+                    functionName={item.functionName}
                   />
                 )}
                 keyExtractor={(item, index) => index.toString()}
@@ -210,10 +287,10 @@ const Home = () => {
                 justifyContent: 'center',
                 justifyContent: 'center',
               }}>
-              <Text>Recent</Text>
+              <Text>Recent {ActualEssentenail} and {ActualSaving}</Text>
               <IconM name="refresh" size={20} />
             </View>
-            <Text>77,234</Text>
+            <Text>77,234 {PlannedEssentenail} {PlannedSaving}</Text>
           </View>
 
           <View
@@ -223,35 +300,19 @@ const Home = () => {
               borderColor: '#d3e6ec',
               borderRadius: 16,
             }}>
-            <List />
-            <List />
-            <List />
-
-            {/* <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <IconM
-              name="question-mark"
-              size={24}
-              color="#4F8EF7"
-              style={{borderWidth: 1, borderColor: '#f2fbfe', padding: 12,borderRadius:24,backgroundColor:"#f2fbfe"}}
-            />
-            <View style = {{marginLeft:8}}>
-              <Text>Title</Text>
-              <Text>Description</Text>
-            </View>
-          </View>
-          <View>
-            <Text>43990</Text>
-          </View>
-        </View> */}
+              {
+               
+               getSMSData
+                .slice()
+                .sort((a, b) => b.date_Mini_Second - a.date_Mini_Second)
+                .map((elem,i) => <List key={elem.date_Mini_Second} data = {elem}/>)
+              }
+  
           </View>
         </View>
       </ScrollView>
+      {OpenEssentialModal? <Essential modal = {OpenEssentialModal} modalfunction = {Essentialmodalfunction}/>:""}
+      {OpenSavingModal? <Saving modal = {OpenSavingModal} OpenSavingModal = {OpenSavingModal}  Savingmodalfunction = {Savingmodalfunction} />:""}
     </View>
   );
 };

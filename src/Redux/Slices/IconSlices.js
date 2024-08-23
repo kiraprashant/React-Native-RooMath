@@ -1,11 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
+import IconColor from "../../Utli/IconColor";
 
 
 
-const CreatedIconSlices = createSlice({
+const IconSlices = createSlice({
     name:"Icon",
     initialState:{
         AllExistingIcon:[],
+        SelectedIconRedux:{}
     },
     reducers:{
         AllAddedIcon(state,action){
@@ -14,9 +16,12 @@ const CreatedIconSlices = createSlice({
         CreatedIconFunction(state,action){
             state.AllExistingIcon.push(action.payload)
           },
+        ChangeIcon(state,action){
+          state.SelectedIconRedux = action.payload
+        }
     }
 })
 
-export const {AllAddedIcon,CreatedIconFunction} = CreatedIconSlices.actions
+export const {AllAddedIcon,CreatedIconFunction,ChangeIcon} = IconSlices.actions
 
-export default CreatedIconSlices.reducer
+export default IconSlices.reducer

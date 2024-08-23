@@ -11,23 +11,83 @@ import FocusSVG from '../../assets/Images/Focus.svg';
 import NotFocusSVG from '../../assets/Images/notFocus.svg';
 import TipSVG from '../../assets/Images/Tip.svg';
 import uuid from 'react-native-uuid';
-import { useNavigation } from '@react-navigation/native';
+import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  ReduxAddEssentenail,
+  ReduxAddSaving,
+} from '../../Redux/Slices/PlannerSlices';
+import {PlannerSaveToLocal} from '../LocalStorage/LocalStorage';
+import Modal from "react-native-modal";
 
 const OnSaving = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
+
   const [fields, setFields] = useState([]);
-  const Navigation = useNavigation()
+  const [recommendSaving, setrecommendSaving] = useState(0);
+  const [TotalSaving,setTotalSaving] = useState(0)
+  const GetSaving = useSelector(state => state.Planner.SavingSlice);
+  const GetIncome = useSelector(state => state.Planner.IncomeSlice);
+  const GetEssentials = useSelector(state => state.Planner.EssentenailSlice);
+
+  const Navigation = useNavigation();
+  const Dispatch = useDispatch();
 
   useEffect(() => {
-    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false};
-    setFields([...fields, newField]);
-  }, []);
+    const GetIncomePrice = GetIncome.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+    const GetEssentialsPrice = GetEssentials.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+   
 
-  const NewScreen = () =>{
-    Navigation.navigate("TabNavigation")
-  }
+    console.log(
+      `.................../,${GetIncomePrice} - ${GetEssentialsPrice} = ${
+        ((GetIncomePrice - GetEssentialsPrice)) * 0.6
+      }`,
+    );
+    console.log((GetIncomePrice - GetEssentialsPrice))
+
+    setrecommendSaving(parseInt(((GetIncomePrice - GetEssentialsPrice)) * 0.5))
+    setTotalSaving(GetIncomePrice - GetEssentialsPrice)
+
+    
+  }, [GetIncome,GetEssentials]);
+
+  useEffect(() => {
+    if (GetSaving.length > 0) {
+      setFields(GetSaving);
+    } else {
+      console.log('Nope i dont have GetSaving');
+      const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false,Budget:"Saving"};
+      setFields([...fields, newField]);
+    }
+  }, [GetSaving]);
+
+  const NewScreen = () => {
+    const SaveData = fields.filter(elem => elem.DeleteBtn === true);
+    
+    console
+    const SavingDataprice = SaveData.reduce((acc,elem) => acc + parseInt(elem.price),0)
+    console.log(SavingDataprice)
+
+    if(TotalSaving < SavingDataprice){
+      setModalVisible(true)
+      return false
+    }
+
+    Dispatch(ReduxAddSaving(SaveData));
+    PlannerSaveToLocal('LocalSaving', SaveData);
+    Navigation.navigate('TabNavigation');
+  };
 
   const addField = () => {
-    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false};
+    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false,Budget:"Saving"};
     setFields([...fields, newField]);
     console.log(fields);
   };
@@ -57,13 +117,20 @@ const OnSaving = () => {
 
   return (
     <View style={{flex: 1}}>
+     <Modal isVisible={isModalVisible} onBackdropPress = {()=> setModalVisible(false)}>
+        <View style={{backgroundColor:"#fff",padding:20}}>
+          <Text style={{textAlign:"center"}}>You excexed more than you total Balance</Text>
+        </View>
+      </Modal>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           padding: 20,
         }}>
-        <Text>Back</Text>
+        <TouchableOpacity onPress={() => Navigation.goBack()}>
+          <Text>Back</Text>
+        </TouchableOpacity>
         <Text style={{color: LightMode.Primary, fontFamily: 'Roboto-Medium'}}>
           Skip
         </Text>
@@ -114,7 +181,7 @@ const OnSaving = () => {
                 fontFamily: 'Roboto-Regular',
                 marginLeft: 20,
               }}>
-              Based on our calculation we recommend to Save around ₹ 11,000 every month.
+              Based on our calculation we recommend to Save around ₹ {recommendSaving} every month. {TotalSaving}
             </Text>
           </View>
           <View>
@@ -142,11 +209,25 @@ const OnSaving = () => {
                 justifyContent: 'space-between',
                 paddingHorizontal: 16,
               }}>
-              <TextInput
-                value={elem.name}
-                onChangeText={text => handleFieldChange(i, 'name', text)}
-                placeholder="Type Here"
-              />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <TouchableOpacity onPress={() => console.log('noob')}>
+                  <IconMC
+                    name="minus-circle"
+                    color={elem.DeleteBtn ? '#a50000' : '#f3bebe'}
+                    size={18}
+                  />
+                </TouchableOpacity>
+                <TextInput
+                  value={elem.name}
+                  onChangeText={text => handleFieldChange(i, 'name', text)}
+                  placeholder="Type Here"
+                />
+              </View>
               <View
                 style={{
                   flexDirection: 'row',
@@ -182,7 +263,7 @@ const OnSaving = () => {
         </View>
       </ScrollView>
       <TouchableOpacity
-      onPress={()=> NewScreen()}
+        onPress={() => NewScreen()}
         style={{
           backgroundColor: LightMode.Primary,
           margin: 20,

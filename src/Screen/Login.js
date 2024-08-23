@@ -1,6 +1,7 @@
 import React, {useEffect,useState} from 'react';
 import {Text, View, StyleSheet,TouchableOpacity} from 'react-native';
 import {GoogleSignin,GoogleSigninButton,statusCodes} from '@react-native-google-signin/google-signin';
+import SplashScreen from 'react-native-splash-screen';
 import Logo from "../assets/Images/Roomath.svg"
 import LightMode from "../Utli/LightMode"
 import { useNavigation } from '@react-navigation/native';
@@ -11,6 +12,7 @@ const Login = () => {
     const Navigation = useNavigation()
 
     useEffect(()=>{
+      SplashScreen.hide();
         GoogleSignin.configure({webClientId:"531970054674-rtrrrgcsu8bktjq6s85omr1i10nkndte.apps.googleusercontent.com"});
         // signIn()
 

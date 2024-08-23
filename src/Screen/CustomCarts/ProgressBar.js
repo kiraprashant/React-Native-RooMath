@@ -1,11 +1,12 @@
 import React , {useRef,useEffect} from 'react';
 import { View, Text, StyleSheet ,Animated } from 'react-native';
 
-const ProgressBar = ({ actual, expected = 0, height }) => {
-    const actualPercentage = Math.min((actual / expected) * 100, 100);
+const ProgressBar = ({ actual = 0, expected = 0, height }) => {
+    const actualPercentage = expected > 0 ? Math.min((actual / expected) * 100, 100):0;
 
   const scaleXValue = useRef(new Animated.Value(0)).current;
 
+console.log(actualPercentage)
 
   useEffect(() => {
     Animated.timing(scaleXValue, {

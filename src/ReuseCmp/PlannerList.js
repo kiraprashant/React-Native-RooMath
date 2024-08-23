@@ -3,6 +3,7 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 
+
 const PlannerList = ({data}) => {
   const {Name, Price,Future,end,Link} = data;
   const Navigation = useNavigation()

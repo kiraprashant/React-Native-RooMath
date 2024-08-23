@@ -18,7 +18,7 @@ const IconColor =
         },
         SkyBlue:{
             TextColor:"#92B2BF",
-            BackgroundColor:" #C2EDFF"
+            BackgroundColor:"#C2EDFF"
         },
         Lavender:{
             TextColor:"#A192BF",
