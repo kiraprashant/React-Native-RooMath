@@ -3,17 +3,19 @@ import {Text, TouchableOpacity, View} from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import uuid from 'react-native-uuid';
 import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useDispatch} from 'react-redux';
+import {useDispatch,useSelector} from 'react-redux';
 import {GetLocaLItem, SavetoLocalStorage,GetplannerFromLocal} from '../LocalStorage/LocalStorage';
 import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ReduxAddIncome,ReduxAddEssentenail,ReduxAddSaving } from '../../Redux/Slices/PlannerSlices';
 import IconColor from '../../Utli/IconColor';
 import { AllAddedIcon,CreatedIconFunction } from '../../Redux/Slices/CreatedIconSlices';
+import ReadSmS from '../SMSPermission/ReadSmS';
 
 const AnimationSplashScreen = () => {
   const Dispatch = useDispatch();
   const Navigation = useNavigation();
+  const smsDataRedux = useSelector((state) => state.SMS.SMSDATA);
 
   const [FirstTag, setFirstTag] = useState(
   
@@ -69,12 +71,30 @@ const AnimationSplashScreen = () => {
     
 
     }
+    
+    const ExpenseDetails = async() =>{
+      const Permission = await AsyncStorage.getItem('Permission')
+      if(Permission === "Access"){
+        if(smsDataRedux > 0){
+          console.log(smsDataRedux.length)
+            console.log("full data")
+        }
+       else {
+        console.log("Sending Data")
+        ReadSmS(Dispatch)
+        }
+      
+      }
+      Navigation.replace("TabNavigation")
+    }
+
+    ExpenseDetails()
     GetIconFunction()
     GetPlannerLocalFunction()
 
-    setTimeout(()=>{
-      Navigation.navigate("SMSScreen")
-    },300)
+    // setTimeout(()=>{
+    //   Navigation.navigate("SMSScreen")
+    // },300)
     
   }, []);
 

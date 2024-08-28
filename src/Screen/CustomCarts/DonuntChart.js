@@ -19,6 +19,8 @@ const {width, height} = Dimensions.get('window');
 const screenSize = Math.min(width, height);
 
 const DonutChart = ({
+  Name,
+  NonEssentenail,
   totalAmount, // Total amount
   spentAmount = totalAmount - spentAmount, // Amount spent today
   radius = (radius = screenSize * 0.30),
@@ -58,7 +60,7 @@ const DonutChart = ({
     const remaining = totalAmount - actualSpentAmount; // Remaining amount
     const percentageSpent = (remaining / totalAmount) * 100; // Percentage of amount spent
     const percentageRemaining = 100 - percentageSpent; // Percentage of remaining amount
-    const anim = animation(percentageRemaining).start();
+    const anim = animation(percentageRemaining>0?percentageRemaining:0).start();
 
     animatedValue.addListener(v => {
       if (Circleref?.current) {
@@ -125,17 +127,17 @@ const DonutChart = ({
       <View style={{position:"absolute",left:0,top:0,bottom:0,right:0,alignItems: "center",justifyContent:"center"}}>
         <Text style={{fontSize:radius / 10,fontWeight:600,color:"#fff"}}>Safe To Spend</Text>
         <View style = {{flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
-          <Text style={{fontSize:radius / 4,color:"#fff"}}>₹ </Text>
+          <Text style={{fontSize:radius / 4,color:"#fff"}}>₹ {totalAmount < spentAmount? "-":null }</Text>
         <AnimatedNumbers
         animationDuration={2000}
         includeComma={true}
         style={{fontSize:1,fontWeight:800,paddingVertical:4}}
-        animateToNumber={animateToNumber}
+        animateToNumber={animateToNumber?animateToNumber:0}
         fontStyle={{ fontSize:radius / 4, fontWeight: 'bold',color:TextColor}}
       />
       </View>
         {/* <AnimatedText ref={TextRef}>$62000</AnimatedText> */}
-        <Text style={{fontSize:radius / 10,color:"#fff"}}>Today</Text>
+        <Text style={{fontSize:radius / 10,color:"#fff"}}>{Name} {totalAmount} , {spentAmount}</Text>
       </View>
 
     </View>

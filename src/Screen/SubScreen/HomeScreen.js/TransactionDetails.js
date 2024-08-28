@@ -10,8 +10,8 @@ import SelectedList from '../../../ReuseCmp/SelectedList';
 import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ChangeIcon } from '../../../Redux/Slices/IconSlices';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SavetoLocalStorage,UpdatetoLocalStorage} from '../../LocalStorage/LocalStorage';
-import { SMSAddtoRedux,ReduxUpdateSMS } from '../../../Redux/Slices/SMSSlices';
+import { SavetoLocalStorage,UpdatetoLocalStorage,RemoveLocalItem} from '../../LocalStorage/LocalStorage';
+import { SMSAddtoRedux,ReduxUpdateSMS,SMSDeleteById} from '../../../Redux/Slices/SMSSlices';
 
 const TransactionDetails = () => {
   const Navigation = useNavigation();
@@ -108,6 +108,13 @@ const TransactionDetails = () => {
     Navigation.goBack()
   }
 
+  const DeleteByID = (data) =>{
+   console.log(data)
+   Dispatch(SMSDeleteById(data))
+   RemoveLocalItem("SMSExpenese",data)
+   GoBack()
+  }
+
   const AddToExpense = async () => {
     const Email = await AsyncStorage.getItem('Email');
     // GoBack();
@@ -162,13 +169,7 @@ const TransactionDetails = () => {
     
     Dispatch(SMSAddtoRedux(data));
     SavetoLocalStorage('SMSExpenese',data)
-
-
-    // const StroageData = await AsyncStorage.getItem('SMSExpenese');
-    // const ParseData = JSON.parse(StroageData);
-    // ParseData.push(data);
-    // const StringData = JSON.stringify(ParseData);
-    // await AsyncStorage.setItem('SMSExpenese', StringData);
+    GoBack()
 
 
   };
@@ -386,9 +387,11 @@ const TransactionDetails = () => {
         ''
       )}
       <View>
+        <TouchableOpacity onPress={()=> DeleteByID(route.params.smsData)}>
         <Text style={{fontSize: 12, color: 'red', textAlign: 'center'}}>
           Delete this Transaction
         </Text>
+        </TouchableOpacity>
       </View>
     </View>
   );

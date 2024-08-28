@@ -10,7 +10,8 @@ const Card = ({
   Name,
   Description,
   Icon,
-  functionName
+  functionName,
+  OverSpend
 }) => {
   return (
     <View>
@@ -42,7 +43,7 @@ const Card = ({
             marginRight: 8,
             backgroundColor: '#fff',
           }}>
-            <Text style={{paddingBottom: 8, fontSize: 14}}>{Name}</Text>
+            <Text style={{paddingBottom: 8, fontSize: 14}}>{Name} {OverSpend}</Text>
             <Text style={{fontSize: 12}}>{Description}</Text>
             <View style={{marginTop: 'auto'}}>
               <Text style={{fontSize: 14}}>

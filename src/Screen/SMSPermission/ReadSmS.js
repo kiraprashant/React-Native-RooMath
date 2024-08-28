@@ -119,7 +119,7 @@ const ReadSmS =async(Dispatch,getIcon) =>{
                 Year:ToDayYearDate,
                 Month:MonthName,
                 Budget:"Nope",
-                relation:"from SmS",
+                relation:"",
                 // Icon:{
                 //   id:uuid.v4(),
                 //   Name:"Others",

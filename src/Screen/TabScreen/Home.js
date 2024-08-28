@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Text, TouchableOpacity, View, FlatList, ScrollView} from 'react-native';
+import {Text, TouchableOpacity, View, FlatList, ScrollView, Alert} from 'react-native';
 import SplashScreen from 'react-native-splash-screen';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import DonutChart from '../CustomCarts/DonuntChart';
@@ -9,114 +9,294 @@ import Card from '../../ReuseCmp/Card';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import List from '../../ReuseCmp/List';
 import LinearGradient from 'react-native-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import Essential from '../SubScreen/PlannedVsActual/Essential';
 import Saving from '../SubScreen/PlannedVsActual/Saving';
-import { useSelector,useDispatch } from 'react-redux';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  ReduxPlannedEssentenailsSpend,
+  ReduxPlannedSavingSpend,
+  ReduxPlannedIncomeSpend,
+  ReduxActualEssentenailsSpend,
+  ReduxActualIncomeSpend,
+  ReduxActualSavingSpend,
+  ReduxAddSaving,
+} from '../../Redux/Slices/PlannerSlices';
 
 const Home = () => {
-  const Dispatch = useDispatch()
-  const Navigation = useNavigation()
-  const getSMSData = useSelector((state) => state.SMS.SMSDATA)
-  const GetEssential = useSelector((state) => state.Planner.EssentenailSlice)
-  const GetSaving = useSelector((state) => state.Planner.SavingSlice)
-  const GetIncome = useSelector((state) => state.Planner.IncomeSlice)
+  const Dispatch = useDispatch();
+  const Navigation = useNavigation();
+  const getSMSData = useSelector(state => state.SMS.SMSDATA);
 
+  const GetEssential = useSelector(state => state.Planner.EssentenailSlice);
+  const GetSaving = useSelector(state => state.Planner.SavingSlice);
+  const GetIncome = useSelector(state => state.Planner.IncomeSlice);
+
+  const GetEssentialPlannedBudget = useSelector(
+    state => state.Planner.PlannedEssentenailsSpend,
+  );
+  const GetSavingPlannedBudget = useSelector(
+    state => state.Planner.PlannedSavingSpend,
+  );
+
+  const GetEssentialActualBudget = useSelector(
+    state => state.Planner.ActualEssentenailsSpend,
+  );
+  const GetSavingActualBudget = useSelector(
+    state => state.Planner.ActualSavingSpend,
+  );
+
+  const GetDefaultIncome = useSelector((state) => state.Planner.PlannedIncomeSpend)
 
   // useEffect(() =>{
   //    console.log("getSMSData////////////// State wala",StateSMS)
   // },[getSMSData])
 
+  console.log('//////////////////////////????????', GetEssential[0]);
 
-  console.log("//////////////////////////",GetEssential)
-
-  const [OpenEssentialModal, setOpenEssentialModal] = useState(false);  
-  const [OpenSavingModal, setOpenSavingModal] = useState(false);  
-  const [StateSMS,setStateSMS] = useState(getSMSData)
+  const [OpenEssentialModal, setOpenEssentialModal] = useState(false);
+  const [OpenSavingModal, setOpenSavingModal] = useState(false);
+  const [StateSMS, setStateSMS] = useState(getSMSData);
 
   const [StateSpendAmount, setStateSpendAmount] = useState(600);
   const [StateTotalAmount, setStateTotalAmount] = useState(1000);
   const [Scaleboth, setScaleboth] = useState(1);
 
+
   const [DemoData, setDemoData] = useState([]);
   const [StartingIndex, setStartingIndex] = useState(0);
 
-  const [MontlySpend, setMontlySpend] = useState(10);
-  const [DailySpend, setDailySpend] = useState(20);
+  const [MontlySpend, setMontlySpend] = useState(0);
+  const [DailySpend, setDailySpend] = useState(0);
 
-  const [PlannedEssentenail, setPlannedEssentenail] = useState(33500);
-  const [ActualEssentenail, setActualEssentenail] = useState(45000);
+  const [PlannedEssentenail, setPlannedEssentenail] = useState(0);
+  const [ActualEssentenail, setActualEssentenail] = useState(0);
 
-  const [PlannedSaving,setPlannedSaving] = useState()
-  const [ActualSaving,setActualSaving] = useState()
+  const [PlannedSaving, setPlannedSaving] = useState(0);
+  const [ActualSaving, setActualSaving] = useState(0);
+
+  const [TotalIncome, setTotalIncome] = useState(0);
+
+  const [OnlyNopeExpense, setOnlyNopeExpense] = useState();
+
+  const [CheckOverSpendEss, setCheckOverSpendEss] = useState();
+
+  const [FinalTotal, setFinalTotal] = useState(0);
+
+  const [CheckOverSpendSaving, setCheckOverSpendSaving] = useState();
+
+  const [StateCalculatePerDay,setStateCalculatePerDay] = useState(0)
+  const [SpendPerDay,setSpendPerDay] = useState(0)
+
+  const [MonthTrsactionAmount,setMonthTrsactionAmount] = useState(0)
 
 
   useEffect(() => {
-
     SplashScreen.hide();
-  },[])
+  }, []);
 
-  useEffect(() => {
-  const getActualEssentail =  getSMSData.reduce((acc,elem) =>{
-     if(elem.Budget === "Essentail"){
-      console.log(".........../getting here")
-     return  acc + elem.RS
-     }
-     else{
-      return acc
-     }
+
+  useEffect(() =>{
+    
+    const getTodayDate = new Date().getDate()
+    console.log("getTodayDategetTodayDategetTodayDategetTodayDategetTodayDate",getTodayDate)
+
+
+    const GetTodaySpend = getSMSData.reduce((acc,elem) =>{
+      const ChechingDate = elem.date_Sent
+      if((new Date(ChechingDate).getDate() === getTodayDate) && elem.Budget === "Nope"){
+       return acc = acc + elem.RS
+      }else{
+        return acc
+      }
     },0)
 
-    console.log("/////////////////////////////",getActualEssentail)
+    const TotalTransactionAmount = getSMSData.reduce((acc,elem) => acc = acc + elem.RS,0)
 
-    const getActualSaving =  getSMSData.reduce((acc,elem) =>{
-      if(elem.Budget === "Saving"){
-      return  acc+elem.RS
-      }
-      else{
-       return acc
-      }
-     },1000)
+    setMonthTrsactionAmount(TotalTransactionAmount)
 
-     setActualEssentenail(getActualEssentail)
-     setActualSaving(getActualSaving)
-
+    setSpendPerDay(GetTodaySpend)
   },[getSMSData])
 
-  
+
+  useEffect(() => {
+    const getActualEssentail = getSMSData.reduce((acc, elem) => {
+      if (elem.Budget === 'Essentail') {
+        console.log('.........../getting here');
+        return acc + elem.RS;
+      } else {
+        return acc;
+      }
+    }, 0);
+
+    console.log('/////////////////////////////', getActualEssentail);
+
+    const getActualSaving = getSMSData.reduce((acc, elem) => {
+      if (elem.Budget === 'Saving') {
+        return acc + elem.RS;
+      } else {
+        return acc;
+      }
+    }, 1000);
+
+    setActualEssentenail(getActualEssentail);
+    setActualSaving(getActualSaving);
+
+    Dispatch(ReduxActualEssentenailsSpend(getActualEssentail));
+    Dispatch(ReduxActualSavingSpend(getActualSaving));
+  }, [getSMSData, GetEssentialActualBudget, GetSavingActualBudget]);
+
+  useEffect(() => {
+    const getIncomeTotal = GetIncome.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+
+    const NonEssentenailAndNonSaving = getSMSData.reduce(
+      (acc, elem) => (elem.Budget === 'Nope' ? acc + parseInt(elem.RS) : acc),
+      0,
+    );
+
+
+    // setCheckingTotal(
+    //   parseInt(getIncomeTotal) -
+    //     (parseInt(GetEssentialTotal) +
+    //       parseInt(GetSavingTotal) +
+    //       parseInt(NonEssentenailAndNonSaving)),
+    // );
+   
+    setTotalIncome(getIncomeTotal);
+    Dispatch(ReduxPlannedIncomeSpend(getIncomeTotal))
+    setOnlyNopeExpense(NonEssentenailAndNonSaving);
+  }, [getSMSData, GetIncome, GetSaving, GetEssential,OnlyNopeExpense]);
+
+  useEffect(() => {
+    const SavingPrice = GetSaving.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+    console.log(SavingPrice);
+    setPlannedSaving(SavingPrice);
+    Dispatch(ReduxPlannedSavingSpend(SavingPrice));
+  }, [GetSaving]);
+
+  useEffect(() => {
+    const EssentialPrice = GetEssential.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+    console.log(EssentialPrice);
+    setPlannedEssentenail(EssentialPrice);
+    Dispatch(ReduxPlannedEssentenailsSpend(EssentialPrice));
+  }, [GetEssential]);
+
+  useEffect(() => {
+    const thisCatogery123 = GetEssential.map(data => {
+      const EssentionCatogery = getSMSData.reduce((total, elem) => {
+        if (elem.Budget === data.Budget && elem.relation === data.name) {
+          return total + elem.RS;
+        } else {
+          return total;
+        }
+      }, 0);
+
+      if (EssentionCatogery > parseInt(data.price)) {
+        console.log('value of EssentailsCutFinal ', EssentionCatogery);
+        setCheckOverSpendEss(
+          prevEssentailCutFinal => prevEssentailCutFinal + EssentionCatogery,
+        );
+        return EssentionCatogery;
+      } else {
+        console.log('value of EssentailsCutFinal ', parseInt(data.price));
+        setCheckOverSpendEss(
+          prevCheckOverSpendEss => prevCheckOverSpendEss + parseInt(data.price),
+        );
+        return parseInt(data.price);
+      }
+
+      // Return the result of the reduce operation for each element in EssentenailsState
+    });
+
+    const datasum = thisCatogery123.reduce((total, sum) => {
+      return total + sum;
+    }, 0);
+
+    setCheckOverSpendEss(datasum);
+    // const adding = GetEssentialActualBudget - GetEssentialPlannedBudget
+    // const more = adding > 0 ? adding : 0
+  }, [
+    getSMSData,
+    GetEssential,
+    GetEssentialActualBudget,
+    GetEssentialPlannedBudget,
+  ]);
+
+  useEffect(() => {
+    const thisCatogery123 = GetSaving.map(data => {
+      const EssentionCatogery = getSMSData.reduce((total, elem) => {
+        if (elem.Budget === data.Budget && elem.relation === data.name) {
+          return total + elem.RS;
+        } else {
+          return total;
+        }
+      }, 0);
+
+      if (EssentionCatogery > parseInt(data.price)) {
+        console.log('value of EssentailsCutFinal ', EssentionCatogery);
+        setCheckOverSpendSaving(
+          prevEssentailCutFinal => prevEssentailCutFinal + EssentionCatogery,
+        );
+        return EssentionCatogery;
+      } else {
+        console.log('value of EssentailsCutFinal ', parseInt(data.price));
+        setCheckOverSpendSaving(
+          prevCheckOverSpendEss => prevCheckOverSpendEss + parseInt(data.price),
+        );
+        return parseInt(data.price);
+      }
+
+      // Return the result of the reduce operation for each element in EssentenailsState
+    });
+
+    const datasum = thisCatogery123.reduce((total, sum) => {
+      return total + sum;
+    }, 0);
+
+    setCheckOverSpendSaving(datasum);
+  }, [getSMSData, GetSaving, GetSavingActualBudget, GetSavingPlannedBudget]);
+
+  useEffect(() => {
+    gotoCutSum();
+    CalculatePerDay();
+  }, [
+    // getSMSData,
+    // GetSaving,
+    GetSavingActualBudget,
+    GetSavingPlannedBudget,
+    // GetEssential,
+    GetEssentialActualBudget,
+    GetEssentialPlannedBudget,
+    MontlySpend,
+    FinalTotal,
+  //  OnlyNopeExpense,
+    GetDefaultIncome,
+    StateCalculatePerDay
+  ]);
 
   useEffect(() =>{
-    const SavingPrice = GetSaving.reduce((acc,elem)=> acc + parseInt(elem.price),0)
-    console.log(SavingPrice)
-    setPlannedSaving(SavingPrice)
-  },[GetSaving])
+        // const CountTrnsaction = (FinalTotal - parseInt(OnlyNopeExpense))
+        // setMontlySpend(CountTrnsaction)
+        
+  },[MontlySpend,OnlyNopeExpense])
 
-  useEffect(() =>{
-    const EssentialPrice = GetEssential.reduce((acc,elem)=> acc + parseInt(elem.price),0)
-    console.log(EssentialPrice)
-    setPlannedEssentenail(EssentialPrice)
-  },[GetEssential])
 
-  const data = [
-    {
-      totalAmount: 3000,
-      spentAmount: MontlySpend,
-    },
-    {
-      totalAmount: 1000,
-      spentAmount: DailySpend,
-    },
-    // Add more data objects as needed
-  ];
+  const Essentialmodalfunction = () => {
+    setOpenEssentialModal(!OpenEssentialModal);
+  };
 
-  const Essentialmodalfunction = () =>{
-    setOpenEssentialModal(!OpenEssentialModal)
-  }
-
-  const Savingmodalfunction = () =>{
-    setOpenSavingModal(!OpenSavingModal)
-  }
-
+  const Savingmodalfunction = () => {
+    setOpenSavingModal(!OpenSavingModal);
+  };
 
   const PlannerData = [
     {
@@ -125,43 +305,101 @@ const Home = () => {
       Description: 'You are on the right track. Good Job!!!',
       ActualSpend: 40,
       PlannedSpend: 100,
-      functionName:()=> modalfunction()
+      functionName: () => modalfunction(),
+      OverSpend:"",
     },
     {
       Name: 'Expense',
       Description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla elit magna, molestie in finibus.',
-      ActualSpend: ActualEssentenail,
-      PlannedSpend: PlannedEssentenail,
-      functionName:()=> Essentialmodalfunction()
+      ActualSpend: GetEssentialActualBudget,
+      PlannedSpend: GetEssentialPlannedBudget,
+      functionName: () => Essentialmodalfunction(),
+      OverSpend:CheckOverSpendEss
     },
     {
       Name: 'Saving',
       Description:
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla elit magna, molestie in finibus.',
-      ActualSpend: ActualSaving,
-      PlannedSpend: PlannedSaving,
-      functionName:()=> Savingmodalfunction()
+      ActualSpend: GetSavingActualBudget,
+      PlannedSpend: GetSavingPlannedBudget,
+      functionName: () => Savingmodalfunction(),
+      OverSpend:CheckOverSpendSaving
     },
   ];
 
   useEffect(() => {
     setDemoData(data);
-  }, [DailySpend, MontlySpend]);
+  }, [DailySpend, MontlySpend,StateCalculatePerDay,SpendPerDay,OnlyNopeExpense]);
 
   const ChangeProgress = () => {
     setStateSpendAmount(Math.random() * 1000);
-    setMontlySpend(Math.random() * 3000);
     setDailySpend(Math.random() * 1000);
 
     console.log(StateSpendAmount);
   };
 
 
+  const gotoCutSum = () => {
+
+    const calculation =
+      (parseInt(CheckOverSpendEss) + parseInt(CheckOverSpendSaving));
+
+    setFinalTotal(parseInt(GetDefaultIncome) - calculation);
+    setMontlySpend(calculation)
+
+    console.log("calculation calculation calculation calculation :",calculation)
+
+    // const indianFormat = new Intl.NumberFormat('en-IN', {
+    //   style: 'currency',
+    //   currency: 'INR',
+    // });
+
+    
+  };
+
+  const CalculatePerDay = () =>{
+    const date = new Date();
+    const Today = new Date().getDate();
+    const lastDay = new Date(
+      date.getFullYear(),
+      date.getMonth() + 1,
+      0,
+    ).getDate();
+    const remainingDay = lastDay + 1 - Today;
+    console.log('Last Day of Month ', lastDay);
+    console.log('remainingDay ', remainingDay);
+    // const PerCalculation = indianFormat.format(
+    //   Math.floor(MontlySpend / remainingDay),
+    // );
+
+    const PerCalculation = Math.floor(FinalTotal / remainingDay)
+    setStateCalculatePerDay(PerCalculation)
+  }
+
+  const data = [
+    {
+      totalAmount: GetDefaultIncome-parseInt(OnlyNopeExpense),
+      spentAmount: MontlySpend,
+      NonEssentenail:parseInt(OnlyNopeExpense),
+      Name: 'Monthly',
+    },
+    {
+      totalAmount: StateCalculatePerDay,
+      spentAmount: SpendPerDay,
+      NonEssentenail:parseInt(OnlyNopeExpense),
+      Name: 'Daily',
+    },
+    // Add more data objects as needed
+  ];
+
   return (
     <View style={{flex: 1, backgroundColor: '#fcfdff'}}>
       <View style={{position: 'absolute', bottom: 20, right: 20, zIndex: 100}}>
-        <TouchableOpacity onPress={()=> Navigation.push("TransactionDetails",{isUpdate: false})}>
+        <TouchableOpacity
+          onPress={() =>
+            Navigation.push('TransactionDetails', {isUpdate: false})
+          }>
           <IconM
             name="add"
             size={48}
@@ -203,6 +441,8 @@ const Home = () => {
                   TextColor="#fff"
                   totalAmount={item.totalAmount}
                   spentAmount={item.spentAmount}
+                  NonEssentenail={item.NonEssentenail}
+                  Name={item.Name}
                 />
               )}
               keyExtractor={(item, index) => index.toString()}
@@ -249,7 +489,7 @@ const Home = () => {
                 borderTopLeftRadius: 16,
                 borderBottomLeftRadius: 16,
               }}
-              colors={['#ECF6FF','#D9EDF3', '#FFFFFF']}>
+              colors={['#ECF6FF', '#D9EDF3', '#FFFFFF']}>
               <FlatList
                 contentContainerStyle={{}}
                 // pagingEnabled={true}
@@ -263,6 +503,7 @@ const Home = () => {
                     Icon={item.Icon}
                     ActualSpend={item.ActualSpend}
                     PlannedSpend={item.PlannedSpend}
+                    OverSpend={item.OverSpend}
                     actualColor="#809AC0"
                     height={5}
                     functionName={item.functionName}
@@ -287,10 +528,16 @@ const Home = () => {
                 justifyContent: 'center',
                 justifyContent: 'center',
               }}>
-              <Text>Recent {ActualEssentenail} and {ActualSaving}</Text>
+              <Text style={{fontSize:12}}>
+                Recent {MonthTrsactionAmount}
+              </Text>
               <IconM name="refresh" size={20} />
             </View>
-            <Text>77,234 {PlannedEssentenail} {PlannedSaving}</Text>
+            
+            <Text style={{fontSize:12}}>
+              {OnlyNopeExpense}  {StateCalculatePerDay - SpendPerDay}
+
+            </Text>
           </View>
 
           <View
@@ -300,21 +547,64 @@ const Home = () => {
               borderColor: '#d3e6ec',
               borderRadius: 16,
             }}>
-              {
-               
-               getSMSData
-                .slice()
-                .sort((a, b) => b.date_Mini_Second - a.date_Mini_Second)
-                .map((elem,i) => <List key={elem.date_Mini_Second} data = {elem}/>)
-              }
-  
+            {getSMSData
+              .slice()
+              .sort((a, b) => b.date_Mini_Second - a.date_Mini_Second)
+              .map((elem, i) => (
+                <List key={elem.date_Mini_Second} data={elem} />
+              ))}
           </View>
         </View>
       </ScrollView>
-      {OpenEssentialModal? <Essential modal = {OpenEssentialModal} modalfunction = {Essentialmodalfunction}/>:""}
-      {OpenSavingModal? <Saving modal = {OpenSavingModal} OpenSavingModal = {OpenSavingModal}  Savingmodalfunction = {Savingmodalfunction} />:""}
+      {OpenEssentialModal ? (
+        <Essential
+          modal={OpenEssentialModal}
+          modalfunction={Essentialmodalfunction}
+        />
+      ) : (
+        ''
+      )}
+      {OpenSavingModal ? (
+        <Saving
+          modal={OpenSavingModal}
+          OpenSavingModal={OpenSavingModal}
+          Savingmodalfunction={Savingmodalfunction}
+        />
+      ) : (
+        ''
+      )}
     </View>
   );
 };
 
 export default Home;
+
+// const thisCatogery123 = EssentenailsState.map(data => {
+//   const EssentionCatogery = smsDataRedux.reduce((total, elem) => {
+//     if (
+//       elem.Budget === data.Name &&
+//       elem.relation === data.Item &&
+//       elem.Month === data.CreatedMonth &&
+//       elem.Year === data.CreatedYear
+//     ) {
+//       return total + elem.RS;
+//     } else {
+
+//       return total; // You need to return the accumulator in the else case
+//     }
+//   }, 0); // Initialize the accumulator with 0
+
+//   if(EssentionCatogery > data.IncomeAndExpense){
+//     console.log("value of EssentailsCutFinal " , EssentionCatogery )
+//     setEssentailCutFinal((prevEssentailCutFinal)=> prevEssentailCutFinal + EssentionCatogery)
+//     return EssentionCatogery
+
+//   }
+//   else{
+//     console.log("value of EssentailsCutFinal " , data.IncomeAndExpense )
+//     setEssentailCutFinal((prevEssentailCutFinal)=> prevEssentailCutFinal + data.IncomeAndExpense)
+//     return data.IncomeAndExpense
+//   }
+
+//   // Return the result of the reduce operation for each element in EssentenailsState
+// });

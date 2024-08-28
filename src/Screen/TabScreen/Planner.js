@@ -1,22 +1,33 @@
 import React, {Component} from 'react';
 import {Text, View} from 'react-native';
 import PlannerList from '../../ReuseCmp/PlannerList';
+import { useSelector } from 'react-redux';
 
 const Planner = () => {
+  const GetEssentialPlannedBudget = useSelector(
+    state => state.Planner.PlannedEssentenailsSpend,
+  );
+  const GetSavingPlannedBudget = useSelector(
+    state => state.Planner.PlannedSavingSpend,
+  );
+
+  const GetIncomePlannedBudget = useSelector(
+    state => state.Planner.PlannedIncomeSpend,
+  );
   const data = [
     {
       Name: 'Income',
-      Price: 1000000,
+      Price: GetIncomePlannedBudget,
       Link: 'IncomeScreen',
     },
     {
       Name: 'Essential Expense',
-      Price: 45000,
+      Price: GetEssentialPlannedBudget,
       Link: 'AddEssentinalsScreen',
     },
     {
       Name: 'Savings',
-      Price: 35000,
+      Price: GetSavingPlannedBudget,
       Link: 'AddSavingScreen',
       end:"done"
     },
