@@ -1,5 +1,5 @@
 import React, {useState, useRef, useEffect} from 'react';
-import {Text, View, TouchableOpacity} from 'react-native';
+import {Text, View, TouchableOpacity, ScrollView} from 'react-native';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import Lightcolors from '../../../Utli/LightMode';
@@ -63,7 +63,7 @@ const TransactionDetails = () => {
     isUpdateMode ? route.params.smsData.Icon : 'information-outline',
   );
   const [body, setbody] = useState(
-    isUpdateMode ? route.params.smsData.body : 'Offline Transation',
+    isUpdateMode ? route.params.smsData.body : 'offline Transaction',
   );
   const [address, setaddress] = useState(
     isUpdateMode ? route.params.smsData.Category : 'Me',
@@ -94,6 +94,8 @@ const TransactionDetails = () => {
 
   useEffect(() =>{
     Dispatch(ChangeIcon(IconSet))
+    setIconSet(IconSet)
+    console.log("/////////////////// Transaction detail",IconSet)
   },[IconSet])
 
   console.log("........./////////............ mic testing",GetIcon[0])
@@ -113,6 +115,13 @@ const TransactionDetails = () => {
    Dispatch(SMSDeleteById(data))
    RemoveLocalItem("SMSExpenese",data)
    GoBack()
+  }
+
+  const BudgetForNope = (data) =>{
+    if(data === "Nope"){
+      setrelation("")
+    }
+    setselectedBudget(data)
   }
 
   const AddToExpense = async () => {
@@ -224,6 +233,7 @@ const TransactionDetails = () => {
          <Text>{isUpdateMode?"Update":"Save"}</Text>
         </TouchableOpacity>
       </View>
+      <ScrollView>
       <View style={{padding: 20, marginBottom: 8}}>
         <View
           style={{
@@ -281,7 +291,7 @@ const TransactionDetails = () => {
                 return (
                   <TouchableOpacity
                     key={i}
-                    onPress={() => setselectedBudget(elem.Name)}
+                    onPress={() => BudgetForNope(elem.Name)}
                     style={{
                       flex: 1,
                       borderWidth: 1,
@@ -310,7 +320,7 @@ const TransactionDetails = () => {
                   borderRadius: 8,
                   borderColor: '#e4e4e4',
                 }}>
-                <Text>{relation}</Text>
+                <Text>{relation?relation:"Select One"}</Text>
               </TouchableOpacity>
               {BudgetOption ? (
                 <View style={{marginTop: 12}}>
@@ -359,7 +369,7 @@ const TransactionDetails = () => {
                   size={16}
                   style={{backgroundColor:userIcon.BackgroundColor, borderRadius: 20,padding:8}}
                 />
-                <Text> {IconSet.Name}</Text>
+                <Text>{userIcon.Name}</Text>
               </View>
               <TouchableOpacity
                 onPress={() => Navigation.navigate('ManageTags', {})}>
@@ -369,7 +379,7 @@ const TransactionDetails = () => {
           </View>
         </View>
       </View>
-      {isUpdateMode !== 'Offline Transation' ? (
+      {body !== 'offline Transaction' ? (
         <View style={{padding: 20, marginBottom: 8}}>
           <View
             style={{
@@ -386,14 +396,16 @@ const TransactionDetails = () => {
       ) : (
         ''
       )}
+      </ScrollView>
       <View>
         <TouchableOpacity onPress={()=> DeleteByID(route.params.smsData)}>
-        <Text style={{fontSize: 12, color: 'red', textAlign: 'center'}}>
+        <Text style={{fontSize: 12, color: 'red', textAlign: 'center',marginBottom:20}}>
           Delete this Transaction
         </Text>
         </TouchableOpacity>
       </View>
     </View>
+  
   );
 };
 

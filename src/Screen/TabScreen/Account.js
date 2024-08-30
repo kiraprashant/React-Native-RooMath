@@ -1,25 +1,76 @@
-import React, {Component} from 'react';
-import {Text, View} from 'react-native';
+import React, {useState,useEffect} from 'react';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import AccountList from '../../ReuseCmp/AccountList';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+// import Logo from "../../assets/Images/User.svg"
+import {Text , View, Image, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+
+
 
 const Account = () => {
+  const Navigation = useNavigation()
+
+const [Name,setName] = useState()
+const [Email,setEmail] = useState()
+const [UserImage,setUserImage] = useState()
+
+useEffect(()=>{
+    GoogleSignin.configure({webClientId:"1039903067617-vq9jctuqdh092auclk1mo3t62akbbaua.apps.googleusercontent.com"});
+  },[])
+
+
+  useEffect(() =>{
+
+    const GetDetails = async() =>{
+      const UserEmail = await AsyncStorage.getItem('Email');
+      const Usersname = await AsyncStorage.getItem('Name');
+      const LocalUserImage = await AsyncStorage.getItem('Image');
+    
+      setName(Usersname)
+      setEmail(UserEmail)
+      setUserImage(LocalUserImage)
+    }
+  
+    GetDetails()
+    console.log("Emsil", UserImage)
+  
+  },[Name,Email,UserImage])
+
+  const Logout = async() =>{
+    try{
+      await GoogleSignin.signOut();
+      // AsyncStorage.clear()
+      Navigation.replace("Login")
+    }
+  
+    catch(e){
+  console.log(e)
+    }
+  }
+
   const data = [
     {
       Name: 'Help',
       Link: '',
+      FunctionName:()=> Logout()
     },
     {
       Name: 'Rate us',
       Link: '',
+      FunctionName:()=> Logout()
     },
     {
       Name: 'About us',
       Link: '',
+      FunctionName:()=> Logout()
     },
     {
       Name: 'Logout',
       Link: '',
+      FunctionName:()=> Logout(),
       end: 'done',
     },
   ];
@@ -41,7 +92,16 @@ const Account = () => {
           paddingVertical: 20,
           marginBottom: 20,
         }}>
-        <IconM
+        {
+          UserImage?
+        <Image source={{ uri:UserImage}} style = {{  width: 50, height: 50,borderRadius:50}} resizeMode="cover"/>
+        :
+        <Image
+        source={require('../../../Asset/User.png')} // Adjust the path according to your project structure
+        resizeMode="contain" // Optionally, set the resize mode
+      />
+        }
+        {/* <IconM
           name="person-4"
           size={48}
           style={{
@@ -50,10 +110,10 @@ const Account = () => {
             borderRadius: 50,
             padding: 8,
           }}
-        />
+        /> */}
         <View style={{marginLeft: 8}}>
-          <Text style={{fontFamily:"Roboto-Medium",fontSize:16}}>User ka Naam</Text>
-          <Text style = {{fontSize:12}}>username@email.com</Text>
+          <Text style={{fontFamily:"Roboto-Medium",fontSize:16}}>{Name}</Text>
+          <Text style = {{fontSize:12}}>{Email}</Text>
         </View>
       </View>
 

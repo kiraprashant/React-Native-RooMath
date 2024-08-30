@@ -22,12 +22,16 @@ import {
   ReduxActualSavingSpend,
   ReduxAddSaving,
 } from '../../Redux/Slices/PlannerSlices';
+import {request, PERMISSIONS } from 'react-native-permissions';
+import ReadSmS from '../SMSPermission/ReadSmS';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Home = () => {
   const Dispatch = useDispatch();
   const Navigation = useNavigation();
   const getSMSData = useSelector(state => state.SMS.SMSDATA);
 
+  const getIcon = useSelector((state) => state.IconRedux.AllExistingIcon)
   const GetEssential = useSelector(state => state.Planner.EssentenailSlice);
   const GetSaving = useSelector(state => state.Planner.SavingSlice);
   const GetIncome = useSelector(state => state.Planner.IncomeSlice);
@@ -137,7 +141,7 @@ const Home = () => {
       } else {
         return acc;
       }
-    }, 1000);
+    }, 0);
 
     setActualEssentenail(getActualEssentail);
     setActualSaving(getActualSaving);
@@ -369,11 +373,12 @@ const Home = () => {
     const remainingDay = lastDay + 1 - Today;
     console.log('Last Day of Month ', lastDay);
     console.log('remainingDay ', remainingDay);
+    console.log("FinalTotal" , FinalTotal)
     // const PerCalculation = indianFormat.format(
     //   Math.floor(MontlySpend / remainingDay),
     // );
 
-    const PerCalculation = Math.floor(FinalTotal / remainingDay)
+    const PerCalculation = Math.floor((FinalTotal-parseInt(OnlyNopeExpense)) / remainingDay)
     setStateCalculatePerDay(PerCalculation)
   }
 
@@ -392,6 +397,26 @@ const Home = () => {
     },
     // Add more data objects as needed
   ];
+
+  const GotoPermissionPage = async(permissions) =>{
+    const granted = await request(permissions)
+      
+    if(granted === "granted"){
+      const Permission =  await AsyncStorage.setItem('Permission',"Access")
+      const Onpermission =  await AsyncStorage.setItem('OnSMSScreen',"Visited")
+      ReadSmS(Dispatch,getIcon)
+      // Navigation.replace("OnAskSalary")
+        console.log(granted)
+    }
+
+    else{
+        console.log("permission Denied ")
+        const Permission =  await AsyncStorage.setItem('Permission',"Denied")
+        const Onpermission =  await AsyncStorage.setItem('OnSMSScreen',"Visited")
+        Navigation.replace("OnAskSalary")
+        console.log(granted)
+    }
+  }
 
   return (
     <View style={{flex: 1, backgroundColor: '#fcfdff'}}>
@@ -528,14 +553,18 @@ const Home = () => {
                 justifyContent: 'center',
                 justifyContent: 'center',
               }}>
+               <TouchableOpacity onPress={() => GotoPermissionPage(PERMISSIONS.ANDROID.READ_SMS)}> 
+              <View style={{flexDirection:"row",alignItems:"center"}}>
               <Text style={{fontSize:12}}>
-                Recent {MonthTrsactionAmount}
+                Recent
               </Text>
               <IconM name="refresh" size={20} />
             </View>
+            </TouchableOpacity>
+            </View>
             
             <Text style={{fontSize:12}}>
-              {OnlyNopeExpense}  {StateCalculatePerDay - SpendPerDay}
+           {MonthTrsactionAmount}
 
             </Text>
           </View>
@@ -548,7 +577,7 @@ const Home = () => {
               borderRadius: 16,
             }}>
             {getSMSData
-              .slice()
+              .slice(0,50)
               .sort((a, b) => b.date_Mini_Second - a.date_Mini_Second)
               .map((elem, i) => (
                 <List key={elem.date_Mini_Second} data={elem} />

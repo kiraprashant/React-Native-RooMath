@@ -17,7 +17,9 @@ const IconSlices = createSlice({
             state.AllExistingIcon.push(action.payload)
           },
         ChangeIcon(state,action){
+            console.log("action.payload Redux :",action.payload)
           state.SelectedIconRedux = action.payload
+
         }
     }
 })

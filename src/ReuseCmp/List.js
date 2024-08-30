@@ -25,7 +25,7 @@ const List = (data) => {
       }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
         <IconMC
-          name={Icon.IconName}
+          name={Icon.IconName?Icon.IconName:"help"}
           size={24}
           color={Icon.TextColor}
           style={{

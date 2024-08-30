@@ -12,37 +12,74 @@ import NotFocusSVG from '../../assets/Images/notFocus.svg';
 import TipSVG from '../../assets/Images/Tip.svg';
 import uuid from 'react-native-uuid';
 import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useNavigation } from '@react-navigation/native';
-import { useSelector,useDispatch } from 'react-redux';
-import { ReduxAddEssentenail,ReduxAddSaving } from '../../Redux/Slices/PlannerSlices';
-import { PlannerSaveToLocal } from '../LocalStorage/LocalStorage';
+import {useNavigation} from '@react-navigation/native';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  ReduxAddEssentenail,
+  ReduxAddSaving,
+} from '../../Redux/Slices/PlannerSlices';
+import {PlannerSaveToLocal} from '../LocalStorage/LocalStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from 'react-native-modal';
 
 const OnEssentials = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
   const [fields, setFields] = useState([]);
-  const GetEssentials = useSelector((state) => state.Planner.EssentenailSlice) 
-  const Navigation = useNavigation()
-  const Dispatch = useDispatch()
+  const GetEssentials = useSelector(state => state.Planner.EssentenailSlice);
+  const GetIncome = useSelector(state => state.Planner.IncomeSlice);
+  const Navigation = useNavigation();
+  const Dispatch = useDispatch();
 
   useEffect(() => {
-    if(GetEssentials.length > 0){
-      setFields(GetEssentials)
-    }
-   else {
-      console.log("Nope i dont have GetEssentials")
-      const newField = {id:uuid.v4(), name: '', price: '',DeleteBtn:false,Budget:"Essentail"};
+    if (GetEssentials.length > 0) {
+      setFields(GetEssentials);
+    } else {
+      console.log('Nope i dont have GetEssentials');
+      const newField = {
+        id: uuid.v4(),
+        name: '',
+        price: '',
+        DeleteBtn: false,
+        Budget: 'Essentail',
+      };
       setFields([...fields, newField]);
     }
   }, [GetEssentials]);
 
-  const NewScreen = () =>{
-    const SaveData = fields.filter((elem)=> elem.DeleteBtn === true )
-    Dispatch(ReduxAddEssentenail(SaveData))
-    PlannerSaveToLocal("LocalEssentials",SaveData)
-    Navigation.navigate("OnSaving")
-  }
+  const NewScreen = async () => {
+    const SaveData = fields.filter(elem => elem.DeleteBtn === true);
+    const TotalEssentoinal = SaveData.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+    const IncomeSaving = GetIncome.reduce(
+      (acc, elem) => acc + parseInt(elem.price),
+      0,
+    );
+    console.log('TotalEssentoinal :', TotalEssentoinal,"IncomeSaving :",IncomeSaving);
+
+    if (TotalEssentoinal <= IncomeSaving) {
+      Dispatch(ReduxAddEssentenail(SaveData));
+      PlannerSaveToLocal('LocalEssentials', SaveData);
+      const OnEssentenails = await AsyncStorage.setItem(
+        'OnEssentenails',
+        'Visited',
+      );
+      Navigation.navigate('OnSaving');
+    } else {
+      setModalVisible(true);
+    }
+  };
 
   const addField = () => {
-    const newField = {id: uuid.v4(), name: '', price: '', DeleteBtn: false,Budget:"Saving"};
+    const newField = {
+      id: uuid.v4(),
+      name: '',
+      price: '',
+      DeleteBtn: false,
+      Budget: 'Saving',
+    };
     setFields([...fields, newField]);
     console.log(fields);
   };
@@ -72,13 +109,24 @@ const OnEssentials = () => {
 
   return (
     <View style={{flex: 1}}>
+      <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            Your Essentenail more than your Income
+          </Text>
+        </View>
+      </Modal>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           padding: 20,
         }}>
-        <TouchableOpacity onPress={()=> Navigation.goBack()}><Text>Back</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => Navigation.goBack()}>
+          <Text>Back</Text>
+        </TouchableOpacity>
         <Text style={{color: LightMode.Primary, fontFamily: 'Roboto-Medium'}}>
           Skip
         </Text>
@@ -140,7 +188,7 @@ const OnEssentials = () => {
                 fontFamily: 'Roboto-Medium',
                 paddingBottom: 20,
               }}>
-              Income
+              Essential
             </Text>
           </View>
         </View>
@@ -157,9 +205,18 @@ const OnEssentials = () => {
                 justifyContent: 'space-between',
                 paddingHorizontal: 16,
               }}>
-              <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
                 <TouchableOpacity onPress={() => console.log('noob')}>
-                  <IconMC name="minus-circle" color={elem.DeleteBtn?"#a50000":"#f3bebe"} size={18} />
+                  <IconMC
+                    name="minus-circle"
+                    color={elem.DeleteBtn ? '#a50000' : '#f3bebe'}
+                    size={18}
+                  />
                 </TouchableOpacity>
                 <TextInput
                   value={elem.name}
@@ -202,7 +259,7 @@ const OnEssentials = () => {
         </View>
       </ScrollView>
       <TouchableOpacity
-      onPress={()=>NewScreen()}
+        onPress={() => NewScreen()}
         style={{
           backgroundColor: LightMode.Primary,
           margin: 20,

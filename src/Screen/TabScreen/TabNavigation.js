@@ -25,10 +25,10 @@ function TabNavigation() {
     return (
       <Animated.View style={[styles.Navgroup, {}]}>
         <Ionicons
-          style={{backgroundColor:focused?"rgba(0, 107, 94,.15)":Lightcolors.PrimaryTextColor,paddingHorizontal:20,paddingTop:3,paddingBottom:3,borderRadius:100}}
+          style={{backgroundColor:focused?"#EAEEF9":"#fff",paddingHorizontal:20,paddingTop:3,paddingBottom:3,borderRadius:100}}
           name={icon}
           size={20}
-          color={focused ? Lightcolors.Primary : Lightcolors.SecondaryTextColor} // Red for unfocused tabs
+          color={focused ? "#384C83" : "#000"} // Red for unfocused tabs
         />
         <Text
           style={{
@@ -50,7 +50,7 @@ function TabNavigation() {
         screenOptions={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarStyle: {backgroundColor:Lightcolors.Primary, height: 70},
+          tabBarStyle: {backgroundColor:"#fff", height: 70},
         }}>
         <Tab.Screen
           name="Home"

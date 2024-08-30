@@ -29,9 +29,9 @@ const AnimationSplashScreen = () => {
 );
 
   useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hide();
-    }, 2000);
+    // setTimeout(() => {
+    //   SplashScreen.hide();
+    // }, 2000);
 
     const GetIconFunction = async() =>{
       const IconDetails = await GetLocaLItem('ManageTags');
@@ -85,7 +85,6 @@ const AnimationSplashScreen = () => {
         }
       
       }
-      Navigation.replace("TabNavigation")
     }
 
     ExpenseDetails()
@@ -107,6 +106,39 @@ const AnimationSplashScreen = () => {
     }
   };
 
+  useEffect(() =>{
+
+    const GotoNextNavigation = async() =>{
+      const UserEmail = await AsyncStorage.getItem('Email');
+      const Usersname = await AsyncStorage.getItem('Name');
+      const UserImage = await AsyncStorage.getItem('Image');
+
+      const OnIncome = await AsyncStorage.getItem('OnIncome');
+      const OnEssentenails = await AsyncStorage.getItem('OnEssentenails');
+      const OnSaving = await AsyncStorage.getItem('OnSaving');
+      const OnPermission =  await AsyncStorage.getItem('OnSMSScreen')
+
+      console.log("///////////////////////////////////////////////UserEmail :",UserEmail)
+      console.log("///////////////////////////////////////////////Usersname :",Usersname)
+      console.log("///////////////////////////////////////////////UserImage :",UserImage)
+
+      if(UserEmail){
+        console.log("Login done")
+        if(OnPermission !== "Visited"){SplashScreen.hide(); return Navigation.replace("OnSMSScreen")}
+       if(OnIncome !== "Visited"){SplashScreen.hide(); return Navigation.replace("OnIncome")}
+       if(OnEssentenails !== "Visited"){SplashScreen.hide(); return Navigation.replace("OnEssentials")}
+       if(OnSaving !== "Visited"){SplashScreen.hide(); return Navigation.replace("OnSaving")}
+
+       return Navigation.replace("TabNavigation") 
+      }else{
+        SplashScreen.hide();
+        Navigation.replace("Login")
+      }
+      
+    }
+
+    GotoNextNavigation()
+  },[])
 
 
   return (

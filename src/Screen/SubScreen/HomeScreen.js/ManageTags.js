@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import {Text, View, TouchableOpacity, TextInput} from 'react-native';
+import {Text, View, TouchableOpacity, TextInput, ScrollView} from 'react-native';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import Lightcolors from '../../../Utli/LightMode';
 import {useNavigation,useRoute} from '@react-navigation/native';
@@ -21,7 +21,7 @@ useEffect(()=>{
   setExistingIcon(getIcon)
 },[getIcon])
  
-  console.log(".......//////..........." , ExistingIcon)
+  console.log(".......//////........... MangaTages" , ExistingIcon)
 
   return (
     <View style={{flex: 1, backgroundColor: '#fcfdff'}}>
@@ -46,6 +46,7 @@ useEffect(()=>{
         </TouchableOpacity>  
       </View>
       <View style={{flex: 1, padding: 20}}>
+        <ScrollView>
         <TextInput
           style={{
             borderWidth: 1,
@@ -68,6 +69,7 @@ useEffect(()=>{
     
 
         </View>
+        </ScrollView>
       </View>
     </View>
   );

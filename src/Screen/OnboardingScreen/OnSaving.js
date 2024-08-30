@@ -20,6 +20,8 @@ import {
 } from '../../Redux/Slices/PlannerSlices';
 import {PlannerSaveToLocal} from '../LocalStorage/LocalStorage';
 import Modal from "react-native-modal";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const OnSaving = () => {
   const [isModalVisible, setModalVisible] = useState(false);
@@ -69,7 +71,7 @@ const OnSaving = () => {
     }
   }, [GetSaving]);
 
-  const NewScreen = () => {
+  const NewScreen = async() => {
     const SaveData = fields.filter(elem => elem.DeleteBtn === true);
     
     console
@@ -83,7 +85,8 @@ const OnSaving = () => {
 
     Dispatch(ReduxAddSaving(SaveData));
     PlannerSaveToLocal('LocalSaving', SaveData);
-    Navigation.navigate('TabNavigation');
+    const OnSaving = await AsyncStorage.setItem('OnSaving',"Visited");
+    Navigation.replace('TabNavigation');
   };
 
   const addField = () => {
@@ -192,7 +195,7 @@ const OnSaving = () => {
                 fontFamily: 'Roboto-Medium',
                 paddingBottom: 20,
               }}>
-              Income
+              Saving
             </Text>
           </View>
         </View>

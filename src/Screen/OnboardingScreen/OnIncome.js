@@ -16,8 +16,11 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {ReduxAddIncome} from '../../Redux/Slices/PlannerSlices';
 import { PlannerSaveToLocal } from '../LocalStorage/LocalStorage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Modal from "react-native-modal";
 
 const OnIncome = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
   const Dispatch = useDispatch();
   const GetIncome = useSelector(state => state.Planner.IncomeSlice);
   const [fields, setFields] = useState([]);
@@ -34,11 +37,20 @@ const OnIncome = () => {
     }
   }, [GetIncome]);
 
-  const NewScreen = () => {
+  const NewScreen = async() => {
     const SaveData = fields.filter(elem => elem.DeleteBtn === true);
+    const TotalSaing = SaveData.reduce((acc,elem) => acc+parseInt(elem.price),0)
+    console.log("TotalSaing :" , TotalSaing)
+    if(TotalSaing>0){
     Dispatch(ReduxAddIncome(SaveData));
     PlannerSaveToLocal("LocalIncome",SaveData)
+    const OnIncome = await AsyncStorage.setItem('OnIncome',"Visited");
     Navigation.navigate('OnEssentials');
+    }
+    else{
+      setModalVisible(true)
+    }
+
   };
 
   const addField = () => {
@@ -72,6 +84,11 @@ const OnIncome = () => {
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
+     <Modal isVisible={isModalVisible} onBackdropPress = {()=> setModalVisible(false)}>
+        <View style={{backgroundColor:"#fff",padding:20}}>
+          <Text style={{textAlign:"center"}}>Income CanNot be Zero Or Negative</Text>
+        </View>
+      </Modal>      
       <View
         style={{
           flexDirection: 'row',

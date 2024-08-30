@@ -38,7 +38,7 @@ const SMSScreen = () => {
       
           if(granted === "granted"){
             const Permission =  await AsyncStorage.setItem('Permission',"Access")
-            const Onpermission =  await AsyncStorage.setItem('OnPermission',"Visited")
+            const Onpermission =  await AsyncStorage.setItem('OnSMSScreen',"Visited")
             ReadSmS(Dispatch,getIcon)
             // Navigation.replace("OnAskSalary")
               console.log(granted)
@@ -47,11 +47,11 @@ const SMSScreen = () => {
           else{
               console.log("permission Denied ")
               const Permission =  await AsyncStorage.setItem('Permission',"Denied")
-              const Onpermission =  await AsyncStorage.setItem('OnPermission',"Visited")
+              const Onpermission =  await AsyncStorage.setItem('OnSMSScreen',"Visited")
               Navigation.replace("OnAskSalary")
               console.log(granted)
           }
-          Navigation.replace("TabNavigation")
+          Navigation.replace("OnIncome")
       }
 
     const Clear = async() =>{
@@ -77,17 +77,6 @@ const SMSScreen = () => {
     </View>
         <TouchableOpacity
        onPress={()=> AskingPermission(PERMISSIONS.ANDROID.READ_SMS)}
-        style={{
-          backgroundColor: Lightcolors.Primary,
-          margin: 20,
-          padding: 16,
-          borderRadius: 8,
-          fontSize: 14,
-        }}>
-        <Text style={{color: '#fff', textAlign: 'center'}}>Next</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-       onPress={()=> Clear()}
         style={{
           backgroundColor: Lightcolors.Primary,
           margin: 20,

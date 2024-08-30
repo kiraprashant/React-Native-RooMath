@@ -1,5 +1,5 @@
 import React, {useEffect,useState} from 'react';
-import {Text, View,TextInput,TouchableOpacity} from 'react-native';
+import {Text, View,TextInput,TouchableOpacity, ScrollView} from 'react-native';
 import Lightcolors from '../../../Utli/LightMode';
 import uuid from "react-native-uuid"
 import IconM from 'react-native-vector-icons/MaterialIcons'
@@ -8,11 +8,16 @@ import { useNavigation } from '@react-navigation/native';
 import { ReduxAddEssentenail } from '../../../Redux/Slices/PlannerSlices';
 import { useSelector,useDispatch } from 'react-redux';
 import { PlannerSaveToLocal } from '../../LocalStorage/LocalStorage';
+import Modal from 'react-native-modal';
+
 
 const AddEssentinalsScreen = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
 
     const [fields,setFields] = useState([])
     const GetEssentials = useSelector((state) => state.Planner.EssentenailSlice) 
+    const PlannedSavingSpend = useSelector((state) => state.Planner.PlannedSavingSpend) 
+    const PlannedIncomeSpend = useSelector((state) => state.Planner.PlannedIncomeSpend) 
     const Dispatch = useDispatch()
     const Navigation = useNavigation()
     useEffect(() => {
@@ -57,14 +62,30 @@ const AddEssentinalsScreen = () => {
 
       const SaveIncome = ()=>{
         const SaveData = fields.filter((elem)=> elem.DeleteBtn === true )
-        Dispatch(ReduxAddEssentenail(SaveData))
+        const GetPlannedEss = SaveData.reduce((acc,elem) => acc+parseInt(elem.price) ,0)
+        if(PlannedIncomeSpend >= (GetPlannedEss+PlannedSavingSpend) ){
+         Dispatch(ReduxAddEssentenail(SaveData))
         PlannerSaveToLocal("LocalEssentials",SaveData)
         Navigation.goBack()
+        }
+        else{
+            console.log("Nope")
+            setModalVisible(true)
+        }
       }
 
 
   return (
     <View style={{flex:1,backgroundColor:"#fff"}}>
+          <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            Your Essentenail more than your Income
+          </Text>
+        </View>
+      </Modal>
       <View
         style={{
           flexDirection: 'row',
@@ -80,6 +101,7 @@ const AddEssentinalsScreen = () => {
         </TouchableOpacity>
       </View>
       <View>
+        <ScrollView>
       {fields.map((elem, i) => {
           return (
             <View
@@ -133,6 +155,7 @@ const AddEssentinalsScreen = () => {
               + Add More
             </Text>
           </TouchableOpacity>
+          </ScrollView>
       </View>
     </View>
   );

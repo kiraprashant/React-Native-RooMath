@@ -13,7 +13,7 @@ const smsSlice = createSlice({
       state.SMSDATA = [...state.SMSDATA,...action.payload]
     },
     SMSAddtoRedux(state, action){
-      state.SMSDATA.unshift(action.payload)
+      state.SMSDATA.push(action.payload)
     },
     SMSDeleteById(state, action){
         console.log(action.payload)

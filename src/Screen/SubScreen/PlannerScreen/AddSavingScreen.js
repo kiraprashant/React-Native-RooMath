@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, TextInput, TouchableOpacity, Touchable} from 'react-native';
+import {Text, View, TextInput, TouchableOpacity, Touchable, ScrollView} from 'react-native';
 import Lightcolors from '../../../Utli/LightMode';
 import uuid from 'react-native-uuid';
 import IconM from 'react-native-vector-icons/MaterialIcons';
@@ -8,10 +8,18 @@ import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
 import {ReduxAddSaving} from '../../../Redux/Slices/PlannerSlices';
 import {PlannerSaveToLocal} from '../../LocalStorage/LocalStorage';
+import Modal from 'react-native-modal';
+
 
 const AddSavingScreen = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
+
   const [fields, setFields] = useState([]);
   const GetSaving = useSelector(state => state.Planner.SavingSlice);
+
+  const PlannedEssentenailsSpend = useSelector((state) => state.Planner.PlannedEssentenailsSpend)
+  const PlannedIncomeSpend = useSelector((state) => state.Planner.PlannedIncomeSpend) 
+
   const Navigation = useNavigation();
   const Dispatch = useDispatch();
 
@@ -54,13 +62,29 @@ const AddSavingScreen = () => {
 
   const SaveIncome = () => {
     const SaveData = fields.filter(elem => elem.DeleteBtn === true);
-    Dispatch(ReduxAddSaving(SaveData));
-    PlannerSaveToLocal('LocalSaving', SaveData);
-    Navigation.goBack();
+    const GetSaving = SaveData.reduce((acc,elem) => acc+parseInt(elem.price),0)
+    if(PlannedIncomeSpend >= (PlannedEssentenailsSpend+GetSaving) ){
+       Dispatch(ReduxAddSaving(SaveData));
+       PlannerSaveToLocal('LocalSaving', SaveData);
+       Navigation.goBack();
+    }
+    else{
+      console.log("nope")
+      setModalVisible(true)
+    }
   };
 
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
+          <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            Your Saving reached the limit
+          </Text>
+        </View>
+      </Modal>
       <View
         style={{
           flexDirection: 'row',
@@ -83,6 +107,7 @@ const AddSavingScreen = () => {
         </TouchableOpacity>
       </View>
       <View>
+        <ScrollView>
         {fields.map((elem, i) => {
           return (
             <View
@@ -136,6 +161,7 @@ const AddSavingScreen = () => {
             + Add More
           </Text>
         </TouchableOpacity>
+        </ScrollView>
       </View>
     </View>
   );

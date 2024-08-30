@@ -1,5 +1,5 @@
 import React, {useEffect,useState} from 'react';
-import {Text, View,TextInput,TouchableOpacity} from 'react-native';
+import {Text, View,TextInput,TouchableOpacity, ScrollView} from 'react-native';
 import Lightcolors from '../../../Utli/LightMode';
 import uuid from "react-native-uuid"
 import IconM from 'react-native-vector-icons/MaterialIcons';
@@ -8,12 +8,19 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector , useDispatch} from 'react-redux';
 import { ReduxAddIncome } from '../../../Redux/Slices/PlannerSlices';
 import { PlannerSaveToLocal } from '../../LocalStorage/LocalStorage';
+import Modal from 'react-native-modal';
+
 
 
 const AddIncomeScreen = () => {
+  const [isModalVisible, setModalVisible] = useState(false);
 
     const [fields,setFields] = useState([])
     const GetIncome = useSelector((state) => state.Planner.IncomeSlice) 
+
+    const PlannedEssentenailsSpend = useSelector((state) => state.Planner.PlannedEssentenailsSpend) 
+    const PlannedSavingSpend = useSelector((state) => state.Planner.PlannedSavingSpend) 
+
     const Navigation = useNavigation()
     const Dispatch = useDispatch()
     useEffect(() => {
@@ -58,14 +65,31 @@ const AddIncomeScreen = () => {
       };
 
       const SaveIncome = ()=>{
-        const SaveData = fields.filter((elem)=> elem.DeleteBtn === true )
+        const SaveData = fields.filter((elem)=> elem.DeleteBtn === true)
+        const PlannedIncome = SaveData.reduce((acc,elem) => acc+parseInt(elem.price) ,0)
+        if(PlannedIncome >= (PlannedEssentenailsSpend+PlannedSavingSpend) )
+        {
         Dispatch(ReduxAddIncome(SaveData))
         PlannerSaveToLocal("LocalIncome",SaveData)
         Navigation.goBack()
+        }
+        else{
+          console.log("Nope")
+          setModalVisible(true)
+        }
       }
 
   return (
     <View style={{flex:1,backgroundColor:"#fff"}}>
+          <Modal
+        isVisible={isModalVisible}
+        onBackdropPress={() => setModalVisible(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            Your Income less Compare to other expense
+          </Text>
+        </View>
+      </Modal>
       <View
         style={{
           flexDirection: 'row',
@@ -81,6 +105,7 @@ const AddIncomeScreen = () => {
         </TouchableOpacity>
       </View>
       <View>
+        <ScrollView>
       {fields.map((elem, i) => {
           return (
             <View
@@ -133,6 +158,7 @@ const AddIncomeScreen = () => {
               + Add More
             </Text>
           </TouchableOpacity>
+          </ScrollView>
       </View>
     </View>
   );

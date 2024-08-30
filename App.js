@@ -54,7 +54,7 @@ function App() {
             options={{headerShown: false}}
           />
             <Stack.Screen
-            name="SMSScreen"
+            name="OnSMSScreen"
             component={SMSScreen}
             options={{headerShown: false}}
           />
