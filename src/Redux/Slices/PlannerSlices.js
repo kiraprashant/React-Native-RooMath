@@ -32,6 +32,26 @@ const PlannerSlices = createSlice({
       );
       state.SavingSlice = updateItem;
     },
+    DeletePlannerSlices(state,action){
+      const DeleteById = action.payload.id;
+      const DeleteByName = action.payload.Budget;
+      console.log("REDUX loged",action.payload)
+
+      if(DeleteByName === "Essentail"){
+        const DeleteItem = state.EssentenailSlice.filter(
+          elem => elem.id !== DeleteById,
+        );
+        state.EssentenailSlice = DeleteItem;
+      }
+      else if(DeleteByName === "Saving"){
+        const DeleteItem = state.SavingSlice.filter(
+          elem => elem.id !== DeleteById,
+        );
+        state.SavingSlice = DeleteItem;
+      }
+    },
+
+
 
     //Planned Spend
     ReduxPlannedIncomeSpend(state, action) {
@@ -69,7 +89,8 @@ export const {
   ReduxPlannedSavingSpend,
   ReduxActualIncomeSpend,
   ReduxActualEssentenailsSpend,
-  ReduxActualSavingSpend
+  ReduxActualSavingSpend,
+  DeletePlannerSlices
 } = PlannerSlices.actions;
 
 export default PlannerSlices.reducer;

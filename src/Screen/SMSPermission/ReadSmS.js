@@ -14,7 +14,7 @@ const ReadSmS =async(Dispatch,getIcon) =>{
     const Email = await AsyncStorage.getItem("Email")
     let alldata = []
 
-
+     console.log("getIcongetIcongetIcongetIcongetIcongetIcongetIcongetIcongetIcongetIcongetIcon" ,getIcon)
     const months = [
       "January", "February", "March",
       "April", "May", "June",
@@ -83,10 +83,10 @@ const ReadSmS =async(Dispatch,getIcon) =>{
               return false
             }
 
-            else if(sms.body.includes("credited") && Fiexed < sms.date_sent){
-              console.log("Credited should not proced " , Fiexed , sms.date_sent)
-              return false
-            }
+            // else if(sms.body.includes("credited") && Fiexed < sms.date_sent){
+            //   console.log("Credited should not proced " , Fiexed , sms.date_sent)
+            //   return false
+            // }
 
             else if(matches && Fiexed < sms.date_sent){
               console.log("Yes Fight HAra Kaisa " , Fiexed , sms.date_sent)
@@ -208,6 +208,7 @@ const ReadSmS =async(Dispatch,getIcon) =>{
               return newData;
           })
 
+          console.log(newDataList)
           settoLocalStorage(newDataList,Dispatch)
 
         
@@ -286,6 +287,8 @@ const ReadSmS =async(Dispatch,getIcon) =>{
              console.log("from Logical Permission" , ParseData.length,TodayMonthName)
             const ThisMonthExpense = ParseData.filter((elem)=> (elem.Month === TodayMonthName) && (elem.Year === GetYear) )
              console.log("from Logical Permission" , ParseData[0].Month)
+             console.log("///////////////////////" ,ParseData[0])
+             ParseData.map((elem,i) => console.log(elem.Icon,i))
              Dispatch(ReadAllSMS(ThisMonthExpense))
             
         }

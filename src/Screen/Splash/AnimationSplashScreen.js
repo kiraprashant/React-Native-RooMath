@@ -9,13 +9,16 @@ import {useNavigation} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ReduxAddIncome,ReduxAddEssentenail,ReduxAddSaving } from '../../Redux/Slices/PlannerSlices';
 import IconColor from '../../Utli/IconColor';
-import { AllAddedIcon,CreatedIconFunction } from '../../Redux/Slices/CreatedIconSlices';
+//import { AllAddedIcon,CreatedIconFunction } from '../../Redux/Slices/CreatedIconSlices';
+import { AllAddedIcon , CreatedIconFunction} from '../../Redux/Slices/IconSlices';
 import ReadSmS from '../SMSPermission/ReadSmS';
+import RooMathLogo from "../../assets/Images/Roomath.svg"
 
 const AnimationSplashScreen = () => {
   const Dispatch = useDispatch();
   const Navigation = useNavigation();
   const smsDataRedux = useSelector((state) => state.SMS.SMSDATA);
+  const GetIcon = useSelector((state) => state.IconRedux.AllExistingIcon)
 
   const [FirstTag, setFirstTag] = useState(
   
@@ -36,10 +39,10 @@ const AnimationSplashScreen = () => {
     const GetIconFunction = async() =>{
       const IconDetails = await GetLocaLItem('ManageTags');
 
-      console.log("////////////////////////////////////" , IconDetails);
+      console.log("//////////////////////////////////// IconDetails" , IconDetails);
 
-      if(IconDetails){
-        console.log("IconDetails")
+      if(IconDetails !== null){
+        console.log("//////////////////////////////////// IconDetails" , IconDetails);
         Dispatch(AllAddedIcon(IconDetails))
       }
       else{
@@ -74,6 +77,7 @@ const AnimationSplashScreen = () => {
     
     const ExpenseDetails = async() =>{
       const Permission = await AsyncStorage.getItem('Permission')
+      const IconDetails = await GetLocaLItem('ManageTags');
       if(Permission === "Access"){
         if(smsDataRedux > 0){
           console.log(smsDataRedux.length)
@@ -81,7 +85,7 @@ const AnimationSplashScreen = () => {
         }
        else {
         console.log("Sending Data")
-        ReadSmS(Dispatch)
+        ReadSmS(Dispatch,IconDetails)
         }
       
       }
@@ -95,7 +99,7 @@ const AnimationSplashScreen = () => {
     //   Navigation.navigate("SMSScreen")
     // },300)
     
-  }, []);
+  },[]);
 
   const clearStorage = async () => {
     try {
@@ -142,29 +146,8 @@ const AnimationSplashScreen = () => {
 
 
   return (
-    <View>
-      <TouchableOpacity onPress={() => Navigation.navigate('TabNavigation')}>
-        <Text>
-          {' '}
-          SplashScreen{' '}
-          <IconMC
-            name={FirstTag.NewIcon}
-            size={24}
-            style={{padding: 12}}
-          />{' '}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => clearStorage()}>
-        <Text>
-          {' '}
-          Clear{' '}
-          <IconMC
-            name={FirstTag.NewIcon}
-            size={24}
-            style={{padding: 12}}
-          />{' '}
-        </Text>
-      </TouchableOpacity>
+    <View style = {{justifyContent:"center",alignItems:"center",flex:1}}>
+     <RooMathLogo />
     </View>
   );
 };

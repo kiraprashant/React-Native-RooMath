@@ -4,9 +4,9 @@ import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 
 const List = (data) => {
-  console.log(".....................", data.data);
   const Navigation = useNavigation(0)
   const { SendTo , RS , date , Icon } = data.data;
+  console.log(Icon)
 
   const GotoAddAndEdit = smsData => {
     //  console.log(data)

@@ -1,108 +1,138 @@
-import React from 'react'
+import React from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const SavetoLocalStorage = async(StorageName,data) =>{
-    try{
-      const existingData = await AsyncStorage.getItem(StorageName);
-      const parsedExistingData = existingData ? JSON.parse(existingData) : [];
-  
-  // Append the new data to the existing array
-      const updatedData = Array.isArray(parsedExistingData)
-    ? [...parsedExistingData, data]
-    : [data];
-  
-  // Save the data to AsyncStorage
-  await AsyncStorage.setItem(StorageName, JSON.stringify(updatedData));
-    }
-    catch(e){
-      console.log("Something Went Wrong in SavetoLocalStorage ",e)
-    }
-    }
+const SavetoLocalStorage = async (StorageName, data) => {
+  try {
+    const existingData = await AsyncStorage.getItem(StorageName);
+    const parsedExistingData = existingData ? JSON.parse(existingData) : [];
 
-    const UpdatetoLocalStorage = async(StorageName,data) =>{
-        try{
-    
-        console.log("Update Local Storrage " , data)
-        const existingData = await AsyncStorage.getItem(StorageName);
-        const parsedData = JSON.parse(existingData);
-    
-        const updateItem = parsedData.map((x) =>x.id === data.id ? data : x);
+    // Append the new data to the existing array
+    const updatedData = Array.isArray(parsedExistingData)
+      ? [...parsedExistingData, data]
+      : [data];
+
+    // Save the data to AsyncStorage
+    await AsyncStorage.setItem(StorageName, JSON.stringify(updatedData));
+  } catch (e) {
+    console.log('Something Went Wrong in SavetoLocalStorage ', e);
+  }
+};
+
+const UpdatetoLocalStorage = async (StorageName, data) => {
+  try {
+    console.log('Update Local Storrage ', data);
+    const existingData = await AsyncStorage.getItem(StorageName);
+    const parsedData = JSON.parse(existingData);
+
+    const updateItem = parsedData.map(x => (x.id === data.id ? data : x));
     // Save the data to AsyncStorage
     await AsyncStorage.setItem(StorageName, JSON.stringify(updateItem));
-      }
-      catch(e){
-        console.log("Something Went Wrong UpdatetoLocalStorage",e)
-      }
-    }
-    
+  } catch (e) {
+    console.log('Something Went Wrong UpdatetoLocalStorage', e);
+  }
+};
 
+const RemoveLocalItem = async (StorageName, data) => {
+  const dataTimeToDelete = data.id;
+  console.log('ListLayout ', dataTimeToDelete);
 
-const RemoveLocalItem = async(StorageName,data) =>{
-
-    const dataTimeToDelete = data.id
-    console.log("ListLayout " , dataTimeToDelete)
- 
-      try {
-        // Retrieve existing data from AsyncStorage
-        const existingData = await AsyncStorage.getItem(StorageName);
-        if (!existingData) {
-          console .log("Here")
-          return; // No data found, nothing to remove
-        }
-
-        console .log("another Here")
-    
-        // Parse the existing data and filter out objectsToRemove
-        const parsedData = JSON.parse(existingData);
-        const updatedData = parsedData.filter(item => item.id != dataTimeToDelete);
-    
-        // Save the updated data back to AsyncStorage
-        await AsyncStorage.setItem(StorageName, JSON.stringify(updatedData));
-    
-        // console.log('Array of objects removed successfully.');
-      } catch (error) {
-        console.error('Error removing objects from AsyncStorage:', error);
-      }
-    };
-    const GetLocaLItem = async (StorageName) => {
-      try {
-        const storedData = await AsyncStorage.getItem(StorageName);
-        if (storedData !== null) {
-          const ParseBudget = JSON.parse(storedData);
-          return ParseBudget;
-        } else {
-          return null;
-        }
-      } catch (error) {
-        // Handle any potential errors when accessing AsyncStorage
-        console.error('Error retrieving data from AsyncStorage:', error);
-        return null;
-      }
+  try {
+    // Retrieve existing data from AsyncStorage
+    const existingData = await AsyncStorage.getItem(StorageName);
+    if (!existingData) {
+      console.log('Here');
+      return; // No data found, nothing to remove
     }
 
-    const PlannerSaveToLocal = async(StorageName,data) =>{
+    console.log('another Here');
+
+    // Parse the existing data and filter out objectsToRemove
+    const parsedData = JSON.parse(existingData);
+    const updatedData = parsedData.filter(item => item.id != dataTimeToDelete);
+
+    // Save the updated data back to AsyncStorage
+    await AsyncStorage.setItem(StorageName, JSON.stringify(updatedData));
+
+    // console.log('Array of objects removed successfully.');
+  } catch (error) {
+    console.error('Error removing objects from AsyncStorage:', error);
+  }
+};
+const GetLocaLItem = async StorageName => {
+  try {
+    const storedData = await AsyncStorage.getItem(StorageName);
+    if (storedData !== null) {
+      const ParseBudget = JSON.parse(storedData);
+      return ParseBudget;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    // Handle any potential errors when accessing AsyncStorage
+    console.error('Error retrieving data from AsyncStorage:', error);
+    return null;
+  }
+};
+
+const PlannerSaveToLocal = async (StorageName, data) => {
+  try {
+    await AsyncStorage.setItem(StorageName, JSON.stringify(data));
+  } catch (e) {
+    console.log('Something Went Wrong in SavetoLocalStorage ', e);
+  }
+};
+
+const PlannerDelete = async (StorageName, data) => {
+  const Update = await AsyncStorage.getItem(StorageName);
+  const ParseUpdate = await JSON.parse(Update);
+  const updatedData = ParseUpdate.filter(item => item.id != data.id);
+  await AsyncStorage.setItem(StorageName, JSON.stringify(updatedData));
+};
+
+const GetplannerFromLocal = async StorageName => {
+  try {
+    const storedData = await AsyncStorage.getItem(StorageName);
+    if (storedData !== null) {
+      const ParseBudget = JSON.parse(storedData);
+      return ParseBudget;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    // Handle any potential errors when accessing AsyncStorage
+    console.error('Error retrieving data from AsyncStorage:', error);
+    return null;
+  }
+};
+
+    const BUlkUpdateLocalSMS = async(StorageName,data) =>{
       try{
-        await AsyncStorage.setItem(StorageName, JSON.stringify(data));
-      }
-      catch(e){
-        console.log("Something Went Wrong in SavetoLocalStorage ",e)
-      }
-    }
+      const storedData = await AsyncStorage.getItem(StorageName);
+      const parsedData = JSON.parse(storedData);
 
-    const GetplannerFromLocal = async(StorageName) =>{
-      try {
-        const storedData = await AsyncStorage.getItem(StorageName);
-        if (storedData !== null) {
-          const ParseBudget = JSON.parse(storedData);
-          return ParseBudget;
-        } else {
-          return null;
+      const UpdateSMSValue =  parsedData.map((elem,i) => {
+        if(elem.relation === data.name && elem.Budget === data.Budget){
+         return {...elem,Budget:"Nope",relation:""}
+        }else{
+         return elem
         }
-      } catch (error) {
-        // Handle any potential errors when accessing AsyncStorage
-        console.error('Error retrieving data from AsyncStorage:', error);
-        return null;
-      }
+      })
+
+      await AsyncStorage.setItem(StorageName, JSON.stringify(UpdateSMSValue));
+    }
+    catch(e){
+      console.error('Error retrieving data from AsyncStorage:', e);
+      return e
+    }
     }
 
- export {SavetoLocalStorage,RemoveLocalItem,UpdatetoLocalStorage,GetLocaLItem,PlannerSaveToLocal,GetplannerFromLocal}
+export {
+  SavetoLocalStorage,
+  RemoveLocalItem,
+  UpdatetoLocalStorage,
+  GetLocaLItem,
+  PlannerSaveToLocal,
+  GetplannerFromLocal,
+  PlannerDelete,
+  BUlkUpdateLocalSMS
+};

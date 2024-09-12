@@ -252,11 +252,14 @@ const TransactionDetails = () => {
               textAlign: 'center',
               fontSize: 40,
               padding: 0,
+              color:"#000"
             }}
+            keyboardType="numeric"
             value={Price}
             ref={ref_input2}
             onChangeText={text => setPrice(text)}
             placeholder="0"
+            
           />
 
           <TextInput
@@ -266,11 +269,12 @@ const TransactionDetails = () => {
               width: '100%',
               textAlign: 'center',
               borderRadius: 8,
+              color:"#000"
             }}
             value={SendTo}
             ref={ref_input2}
             onChangeText={text => setSendTo(text)}
-            placeholder="0"
+            placeholder="What are you spending On"
           />
         </View>
       </View>
@@ -397,13 +401,19 @@ const TransactionDetails = () => {
         ''
       )}
       </ScrollView>
-      <View>
+      {
+        isUpdateMode?
+        <View>
         <TouchableOpacity onPress={()=> DeleteByID(route.params.smsData)}>
         <Text style={{fontSize: 12, color: 'red', textAlign: 'center',marginBottom:20}}>
           Delete this Transaction
         </Text>
         </TouchableOpacity>
       </View>
+      :
+      null
+      }
+    
     </View>
   
   );

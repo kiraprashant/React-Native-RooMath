@@ -6,16 +6,25 @@ import IconM from 'react-native-vector-icons/MaterialIcons';
 import IconMC from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useNavigation} from '@react-navigation/native';
 import {useSelector, useDispatch} from 'react-redux';
-import {ReduxAddSaving} from '../../../Redux/Slices/PlannerSlices';
-import {PlannerSaveToLocal} from '../../LocalStorage/LocalStorage';
+import {ReduxAddSaving,DeletePlannerSlices} from '../../../Redux/Slices/PlannerSlices';
+import {PlannerSaveToLocal,BUlkUpdateLocalSMS,PlannerDelete} from '../../LocalStorage/LocalStorage';
+import { BUlkUpdateSMS } from '../../../Redux/Slices/SMSSlices';
+
 import Modal from 'react-native-modal';
 
 
 const AddSavingScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [DeleteModal, setDeleteModal] = useState(false);
+
 
   const [fields, setFields] = useState([]);
+  const [Holdfields, setHoldFields] = useState();
+
+  
   const GetSaving = useSelector(state => state.Planner.SavingSlice);
+  const getSMSData = useSelector(state => state.SMS.SMSDATA);
+
 
   const PlannedEssentenailsSpend = useSelector((state) => state.Planner.PlannedEssentenailsSpend)
   const PlannedIncomeSpend = useSelector((state) => state.Planner.PlannedIncomeSpend) 
@@ -74,6 +83,41 @@ const AddSavingScreen = () => {
     }
   };
 
+  const DeleteEss = data => {
+    console.log(data);
+    // Dispatch(DeletePlannerSlices(data))
+    // const DeleteId = fields.filter((elem,i) => elem.id !== data.id)
+    const gotlength = getSMSData.filter(
+      (elem, i) => elem.relation === data.name && elem.Budget === data.Budget,
+    );
+    setDeleteModal(true);
+    console.log(gotlength.length);
+    //setFields(DeleteId)
+    setHoldFields(data)
+  };
+
+  const ConfirmDelete = async() =>{
+    const DeleteId = fields.filter((elem,i) => elem.id !== Holdfields.id)
+     console.log("ConfirmDelete called");
+
+    const UpdateSMSValue =  getSMSData.map((elem,i) => {
+      if(elem.relation === Holdfields.name && elem.Budget === Holdfields.Budget){
+       return {...elem,Budget:"Nope",relation:""}
+      }else{
+       return elem
+      }
+    })
+    Dispatch(BUlkUpdateSMS(UpdateSMSValue))
+    Dispatch(DeletePlannerSlices(Holdfields))
+    
+    PlannerDelete("LocalSaving",Holdfields)
+    BUlkUpdateLocalSMS("SMSExpenese",Holdfields)
+
+
+    setFields(DeleteId)
+    setDeleteModal(false)
+  }
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
           <Modal
@@ -83,6 +127,35 @@ const AddSavingScreen = () => {
           <Text style={{textAlign: 'center'}}>
             Your Saving reached the limit
           </Text>
+        </View>
+      </Modal>
+
+      <Modal
+        isVisible={DeleteModal}
+        onBackdropPress={() => setDeleteModal(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            which Transaction Details in Actual will automatic normal
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => ConfirmDelete()}
+              style={{
+                backgroundColor: 'red',
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}>
+              <Text style={{color: '#fff'}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
       <View
@@ -121,10 +194,11 @@ const AddSavingScreen = () => {
                 paddingHorizontal: 16,
               }}>
               <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
-                <TouchableOpacity onPress={() => console.log('noob')}>
+                <TouchableOpacity onPress={() => elem.DeleteBtn?DeleteEss(elem):null}>
                   <IconMC name="minus-circle" color={elem.DeleteBtn?"#a50000":"#f3bebe"} size={18} />
                 </TouchableOpacity>
                 <TextInput
+                 style={{color:"#000"}}
                   value={elem.name}
                   onChangeText={text => handleFieldChange(i, 'name', text)}
                   placeholder="Type Here"
@@ -139,7 +213,7 @@ const AddSavingScreen = () => {
                 }}>
                 <Text>₹</Text>
                 <TextInput
-                  style={{}}
+                  style={{color:"#000"}}
                   value={elem.price}
                   onChangeText={text => handleFieldChange(i, 'price', text)}
                   keyboardType="numeric"

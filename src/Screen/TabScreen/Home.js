@@ -30,6 +30,7 @@ const Home = () => {
   const Dispatch = useDispatch();
   const Navigation = useNavigation();
   const getSMSData = useSelector(state => state.SMS.SMSDATA);
+  const getTotalDelete = useSelector(state => state.SMS.DeletedSMS);
 
   const getIcon = useSelector((state) => state.IconRedux.AllExistingIcon)
   const GetEssential = useSelector(state => state.Planner.EssentenailSlice);
@@ -81,9 +82,9 @@ const Home = () => {
 
   const [TotalIncome, setTotalIncome] = useState(0);
 
-  const [OnlyNopeExpense, setOnlyNopeExpense] = useState();
+  const [OnlyNopeExpense, setOnlyNopeExpense] = useState(0);
 
-  const [CheckOverSpendEss, setCheckOverSpendEss] = useState();
+  const [CheckOverSpendEss, setCheckOverSpendEss] = useState(0);
 
   const [FinalTotal, setFinalTotal] = useState(0);
 
@@ -93,12 +94,16 @@ const Home = () => {
   const [SpendPerDay,setSpendPerDay] = useState(0)
 
   const [MonthTrsactionAmount,setMonthTrsactionAmount] = useState(0)
+  const [StateDeteleTotalSMS,setStateDeteleTotalSMS] = useState(getTotalDelete)
 
 
   useEffect(() => {
     SplashScreen.hide();
   }, []);
 
+  useEffect(() =>{
+    setStateDeteleTotalSMS(getTotalDelete)
+  },[StateDeteleTotalSMS,getTotalDelete])
 
   useEffect(() =>{
     
@@ -143,12 +148,15 @@ const Home = () => {
       }
     }, 0);
 
-    setActualEssentenail(getActualEssentail);
+    // setActualEssentenail(getActualEssentail);
     setActualSaving(getActualSaving);
-
+//     if(ActualSaving >= GetSavingPlannedBudget)
+// {
+//   Dispatch(ReduxActualSavingSpend(getActualSaving));
+// }
     Dispatch(ReduxActualEssentenailsSpend(getActualEssentail));
-    Dispatch(ReduxActualSavingSpend(getActualSaving));
-  }, [getSMSData, GetEssentialActualBudget, GetSavingActualBudget]);
+     Dispatch(ReduxActualSavingSpend(getActualSaving));
+  }, [getSMSData, GetEssentialActualBudget, GetSavingActualBudget,ActualSaving]);
 
   useEffect(() => {
     const getIncomeTotal = GetIncome.reduce(
@@ -172,7 +180,7 @@ const Home = () => {
     setTotalIncome(getIncomeTotal);
     Dispatch(ReduxPlannedIncomeSpend(getIncomeTotal))
     setOnlyNopeExpense(NonEssentenailAndNonSaving);
-  }, [getSMSData, GetIncome, GetSaving, GetEssential,OnlyNopeExpense]);
+  }, [getSMSData, GetIncome, GetSaving, GetEssential,OnlyNopeExpense,]);
 
   useEffect(() => {
     const SavingPrice = GetSaving.reduce(
@@ -233,6 +241,7 @@ const Home = () => {
     GetEssential,
     GetEssentialActualBudget,
     GetEssentialPlannedBudget,
+    
   ]);
 
   useEffect(() => {
@@ -267,12 +276,13 @@ const Home = () => {
     }, 0);
 
     setCheckOverSpendSaving(datasum);
-  }, [getSMSData, GetSaving, GetSavingActualBudget, GetSavingPlannedBudget]);
+  }, [getSMSData, GetSaving, GetSavingActualBudget, GetSavingPlannedBudget,]);
 
   useEffect(() => {
     gotoCutSum();
     CalculatePerDay();
   }, [
+    //,
     // getSMSData,
     // GetSaving,
     GetSavingActualBudget,
@@ -282,16 +292,17 @@ const Home = () => {
     GetEssentialPlannedBudget,
     MontlySpend,
     FinalTotal,
-  //  OnlyNopeExpense,
+    //OnlyNopeExpense,
     GetDefaultIncome,
-    StateCalculatePerDay
+    StateCalculatePerDay,
+    StateDeteleTotalSMS
   ]);
 
   useEffect(() =>{
-        // const CountTrnsaction = (FinalTotal - parseInt(OnlyNopeExpense))
-        // setMontlySpend(CountTrnsaction)
-        
-  },[MontlySpend,OnlyNopeExpense])
+    gotoCutSum();
+    console.log("//////////////////////////////////////Ye ohh raha hai kya")
+    CalculatePerDay();
+  },[StateCalculatePerDay])
 
 
   const Essentialmodalfunction = () => {
@@ -334,14 +345,9 @@ const Home = () => {
 
   useEffect(() => {
     setDemoData(data);
-  }, [DailySpend, MontlySpend,StateCalculatePerDay,SpendPerDay,OnlyNopeExpense]);
+    console.log("//////////////////////////////////////////ChartUpdating",data)
+  }, [MontlySpend,StateCalculatePerDay,SpendPerDay,OnlyNopeExpense,getSMSData,FinalTotal,getTotalDelete,StateDeteleTotalSMS]);
 
-  const ChangeProgress = () => {
-    setStateSpendAmount(Math.random() * 1000);
-    setDailySpend(Math.random() * 1000);
-
-    console.log(StateSpendAmount);
-  };
 
 
   const gotoCutSum = () => {
@@ -378,21 +384,22 @@ const Home = () => {
     //   Math.floor(MontlySpend / remainingDay),
     // );
 
+    console.log("OnlyNopeExpenseOnlyNopeExpenseOnlyNopeExpense", OnlyNopeExpense)
+
     const PerCalculation = Math.floor((FinalTotal-parseInt(OnlyNopeExpense)) / remainingDay)
     setStateCalculatePerDay(PerCalculation)
   }
 
   const data = [
     {
-      totalAmount: GetDefaultIncome-parseInt(OnlyNopeExpense),
-      spentAmount: MontlySpend,
-      NonEssentenail:parseInt(OnlyNopeExpense),
+      totalAmount: FinalTotal,
+      spentAmount: parseInt(OnlyNopeExpense),
       Name: 'Monthly',
     },
     {
       totalAmount: StateCalculatePerDay,
       spentAmount: SpendPerDay,
-      NonEssentenail:parseInt(OnlyNopeExpense),
+      NonEssentenail:0,
       Name: 'Daily',
     },
     // Add more data objects as needed
@@ -556,7 +563,7 @@ const Home = () => {
                <TouchableOpacity onPress={() => GotoPermissionPage(PERMISSIONS.ANDROID.READ_SMS)}> 
               <View style={{flexDirection:"row",alignItems:"center"}}>
               <Text style={{fontSize:12}}>
-                Recent
+                {StateCalculatePerDay} ß {StateDeteleTotalSMS} Recent {getTotalDelete}
               </Text>
               <IconM name="refresh" size={20} />
             </View>

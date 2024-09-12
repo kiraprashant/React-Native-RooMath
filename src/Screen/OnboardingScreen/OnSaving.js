@@ -226,6 +226,7 @@ const OnSaving = () => {
                   />
                 </TouchableOpacity>
                 <TextInput
+                  style={{color:"#000"}}
                   value={elem.name}
                   onChangeText={text => handleFieldChange(i, 'name', text)}
                   placeholder="Type Here"
@@ -239,7 +240,7 @@ const OnSaving = () => {
                 }}>
                 <Text>₹</Text>
                 <TextInput
-                  style={{}}
+                  style={{color:"#000"}}
                   value={elem.price}
                   onChangeText={text => handleFieldChange(i, 'price', text)}
                   keyboardType="numeric"
