@@ -14,8 +14,11 @@ import Modal from 'react-native-modal';
 
 const AddIncomeScreen = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [DeleteModal, setDeleteModal] = useState(false);
+  
 
     const [fields,setFields] = useState([])
+    const [Holdfields, setHoldFields] = useState();
     const GetIncome = useSelector((state) => state.Planner.IncomeSlice) 
 
     const PlannedEssentenailsSpend = useSelector((state) => state.Planner.PlannedEssentenailsSpend) 
@@ -79,6 +82,25 @@ const AddIncomeScreen = () => {
         }
       }
 
+      const DeleteEss = data => {
+        console.log(data);
+        // Dispatch(DeletePlannerSlices(data))
+        // const DeleteId = fields.filter((elem,i) => elem.id !== data.id)
+        // const gotlength = getSMSData.filter(
+        //   (elem, i) => elem.relation === data.name && elem.Budget === data.Budget,
+        // );
+        setDeleteModal(true);
+        // console.log(gotlength.length);
+        //setFields(DeleteId)
+        setHoldFields(data)
+      };
+
+      const ConfirmDelete = () =>{
+        const DeleteId = fields.filter((elem,i) => elem.id !== Holdfields.id)
+        setFields(DeleteId)
+        setDeleteModal(false)
+      }
+
   return (
     <View style={{flex:1,backgroundColor:"#fff"}}>
           <Modal
@@ -86,10 +108,40 @@ const AddIncomeScreen = () => {
         onBackdropPress={() => setModalVisible(false)}>
         <View style={{backgroundColor: '#fff', padding: 20}}>
           <Text style={{textAlign: 'center'}}>
-            Your Income less Compare to other expense
+             Are You Sure You want to delete 
           </Text>
         </View>
       </Modal>
+
+      <Modal
+        isVisible={DeleteModal}
+        onBackdropPress={() => setDeleteModal(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            which Transaction Details in Actual will automatic normal
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => ConfirmDelete()}
+              style={{
+                backgroundColor: 'red',
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}>
+              <Text style={{color: '#fff'}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View
         style={{
           flexDirection: 'row',
@@ -119,7 +171,7 @@ const AddIncomeScreen = () => {
                 paddingHorizontal: 16,
               }}>
              <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
-                <TouchableOpacity onPress={() => console.log('noob')}>
+             <TouchableOpacity onPress={() => elem.DeleteBtn?DeleteEss(elem):null}>
                   <IconMC name="minus-circle" color={elem.DeleteBtn?"#a50000":"#f3bebe"} size={18} />
                 </TouchableOpacity>
                 <TextInput
@@ -137,7 +189,7 @@ const AddIncomeScreen = () => {
                 }}>
                 <Text>₹</Text>
                 <TextInput
-                  style={{color:"#000"}}
+                  style={{color:"#000",width:80}}
                   value={elem.price}
                   onChangeText={text => handleFieldChange(i, 'price', text)}
                   keyboardType="numeric"

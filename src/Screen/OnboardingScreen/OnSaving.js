@@ -25,14 +25,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const OnSaving = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [DeleteModal, setDeleteModal] = useState(false);
 
 
   const [fields, setFields] = useState([]);
+  const [Holdfields, setHoldFields] = useState();
+
   const [recommendSaving, setrecommendSaving] = useState(0);
   const [TotalSaving,setTotalSaving] = useState(0)
   const GetSaving = useSelector(state => state.Planner.SavingSlice);
   const GetIncome = useSelector(state => state.Planner.IncomeSlice);
-  const GetEssentials = useSelector(state => state.Planner.EssentenailSlice);
+  const GetEssentials = useSelector(state => state.Planner.EssentenailSlice)
+  const getSMSData = useSelector(state => state.SMS.SMSDATA);;
 
   const Navigation = useNavigation();
   const Dispatch = useDispatch();
@@ -118,6 +122,41 @@ const OnSaving = () => {
     }
   };
 
+  const DeleteEss = data => {
+    console.log(data);
+    // Dispatch(DeletePlannerSlices(data))
+    // const DeleteId = fields.filter((elem,i) => elem.id !== data.id)
+    const gotlength = getSMSData.filter(
+      (elem, i) => elem.relation === data.name && elem.Budget === data.Budget,
+    );
+    setDeleteModal(true);
+    console.log(gotlength.length);
+    //setFields(DeleteId)
+    setHoldFields(data)
+  };
+
+  const ConfirmDelete = async() =>{
+    const DeleteId = fields.filter((elem,i) => elem.id !== Holdfields.id)
+     console.log("ConfirmDelete called");
+
+    const UpdateSMSValue =  getSMSData.map((elem,i) => {
+      if(elem.relation === Holdfields.name && elem.Budget === Holdfields.Budget){
+       return {...elem,Budget:"Nope",relation:""}
+      }else{
+       return elem
+      }
+    })
+    Dispatch(BUlkUpdateSMS(UpdateSMSValue))
+    Dispatch(DeletePlannerSlices(Holdfields))
+    
+    PlannerDelete("LocalSaving",Holdfields)
+    BUlkUpdateLocalSMS("SMSExpenese",Holdfields)
+
+
+    setFields(DeleteId)
+    setDeleteModal(false)
+  }
+
   return (
     <View style={{flex: 1}}>
      <Modal isVisible={isModalVisible} onBackdropPress = {()=> setModalVisible(false)}>
@@ -125,6 +164,36 @@ const OnSaving = () => {
           <Text style={{textAlign:"center"}}>You excexed more than you total Balance</Text>
         </View>
       </Modal>
+
+      <Modal
+        isVisible={DeleteModal}
+        onBackdropPress={() => setDeleteModal(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            which Transaction Details in Actual will automatic normal
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => ConfirmDelete()}
+              style={{
+                backgroundColor: 'red',
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}>
+              <Text style={{color: '#fff'}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View
         style={{
           flexDirection: 'row',
@@ -218,7 +287,7 @@ const OnSaving = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <TouchableOpacity onPress={() => console.log('noob')}>
+                <TouchableOpacity onPress={() => elem.DeleteBtn?DeleteEss(elem):null}>
                   <IconMC
                     name="minus-circle"
                     color={elem.DeleteBtn ? '#a50000' : '#f3bebe'}

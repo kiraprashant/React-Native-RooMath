@@ -12,11 +12,15 @@ const Essential = ({modal, modalfunction}) => {
   const [StatePlanned, setStatePlanned] = useState();
   const [SwitchGraph, setSwitchGraph] = useState(false);
   const [RelationList, setRelationList] = useState(false);
+  const [RelationListID, setRelationListID] = useState(false);
 
-  const GetEssentialFunction = (ActualValue, PlannedValue, Relationname) => {
+
+
+  const GetEssentialFunction = (ActualValue, PlannedValue, Relationname,RelationID) => {
     setStateActual(ActualValue);
     setStatePlanned(PlannedValue);
     setRelationList(Relationname);
+    setRelationListID(RelationID)
     setSwitchGraph(true);
 
   };
@@ -62,6 +66,7 @@ const Essential = ({modal, modalfunction}) => {
                   StatePlanned={StatePlanned}
                   ChangingView={ChangingView}
                   RelationList={RelationList}
+                  RelationListID={RelationListID}
                 />
               ) : (
                 <BudgetEssential

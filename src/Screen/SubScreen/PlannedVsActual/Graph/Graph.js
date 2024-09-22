@@ -5,20 +5,21 @@ import BarChart from '../../../CustomCarts/BarChart';
 import IconM from 'react-native-vector-icons/MaterialIcons';
 import { useSelector } from 'react-redux';
 
-const Graph = ({StateActual, StatePlanned, ChangingView,RelationList}) => {
-  const GetEssential = useSelector((state) => state.SMS.SMSDATA)
+const Graph = ({StateActual, StatePlanned, ChangingView,RelationList,RelationListID}) => {
+  const SMSData = useSelector((state) => state.SMS.SMSDATA)
   const [StateEssetenailCategory,setStateEssetenailCategory] = useState([])
 
   useEffect(() =>{
-    const getCategoryEss = GetEssential.filter((elem,i) =>{
-      if(elem.relation === RelationList){
+    const getCategoryEss = SMSData.filter((elem,i) =>{
+      if(elem.relation.id === RelationListID){
+         //console.log(elem.name,"yaayyyyyy")
          return elem
       }
     })
 
-    console.log("/////////............////////" ,getCategoryEss)
+    console.log("/////////............////////" ,SMSData[0],"////////////////////////",RelationList)
     setStateEssetenailCategory(getCategoryEss)
-  },[GetEssential])
+  },[SMSData])
   return (
     <View style={{flex: 1}}>
       <View

@@ -24,8 +24,11 @@ import Modal from 'react-native-modal';
 
 const OnEssentials = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [DeleteModal, setDeleteModal] = useState(false);
+  const [Holdfields, setHoldFields] = useState();
 
   const [fields, setFields] = useState([]);
+  const getSMSData = useSelector(state => state.SMS.SMSDATA);
   const GetEssentials = useSelector(state => state.Planner.EssentenailSlice);
   const GetIncome = useSelector(state => state.Planner.IncomeSlice);
   const Navigation = useNavigation();
@@ -107,6 +110,41 @@ const OnEssentials = () => {
     }
   };
 
+
+  const DeleteEss = data => {
+    console.log(data);
+    // Dispatch(DeletePlannerSlices(data))
+    // const DeleteId = fields.filter((elem,i) => elem.id !== data.id)
+    const gotlength = getSMSData.filter(
+      (elem, i) => elem.relation === data.name && elem.Budget === data.Budget,
+    );
+    setDeleteModal(true);
+    console.log(gotlength.length);
+    //setFields(DeleteId)
+    setHoldFields(data)
+  };
+
+  const ConfirmDelete = async() =>{
+    const DeleteId = fields.filter((elem,i) => elem.id !== Holdfields.id)
+     console.log("ConfirmDelete called");
+
+    const UpdateSMSValue =  getSMSData.map((elem,i) => {
+      if(elem.relation === Holdfields.name && elem.Budget === Holdfields.Budget){
+       return {...elem,Budget:"Nope",relation:""}
+      }else{
+       return elem
+      }
+    })
+    Dispatch(BUlkUpdateSMS(UpdateSMSValue))
+    Dispatch(DeletePlannerSlices(Holdfields))
+    PlannerDelete("LocalEssentials",Holdfields)
+    BUlkUpdateLocalSMS("SMSExpenese",Holdfields)
+
+
+    setFields(DeleteId)
+    setDeleteModal(false)
+  }
+
   return (
     <View style={{flex: 1}}>
       <Modal
@@ -118,6 +156,37 @@ const OnEssentials = () => {
           </Text>
         </View>
       </Modal>
+
+      <Modal
+        isVisible={DeleteModal}
+        onBackdropPress={() => setDeleteModal(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+            which Transaction Details in Actual will automatic normal
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => ConfirmDelete()}
+              style={{
+                backgroundColor: 'red',
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}>
+              <Text style={{color: '#fff'}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+
       <View
         style={{
           flexDirection: 'row',
@@ -211,7 +280,7 @@ const OnEssentials = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}>
-                <TouchableOpacity onPress={() => console.log('noob')}>
+                <TouchableOpacity  onPress={() => (elem.DeleteBtn ? DeleteEss(elem) : null)}>
                   <IconMC
                     name="minus-circle"
                     color={elem.DeleteBtn ? '#a50000' : '#f3bebe'}

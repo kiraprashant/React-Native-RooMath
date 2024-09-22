@@ -205,7 +205,7 @@ const Home = () => {
   useEffect(() => {
     const thisCatogery123 = GetEssential.map(data => {
       const EssentionCatogery = getSMSData.reduce((total, elem) => {
-        if (elem.Budget === data.Budget && elem.relation === data.name) {
+        if (elem.Budget === data.Budget && elem.relation.id === data.id) {
           return total + elem.RS;
         } else {
           return total;
@@ -247,7 +247,7 @@ const Home = () => {
   useEffect(() => {
     const thisCatogery123 = GetSaving.map(data => {
       const EssentionCatogery = getSMSData.reduce((total, elem) => {
-        if (elem.Budget === data.Budget && elem.relation === data.name) {
+        if (elem.Budget === data.Budget && elem.relation.id === data.id) {
           return total + elem.RS;
         } else {
           return total;
@@ -563,7 +563,7 @@ const Home = () => {
                <TouchableOpacity onPress={() => GotoPermissionPage(PERMISSIONS.ANDROID.READ_SMS)}> 
               <View style={{flexDirection:"row",alignItems:"center"}}>
               <Text style={{fontSize:12}}>
-                {StateCalculatePerDay} ß {StateDeteleTotalSMS} Recent {getTotalDelete}
+                Recent
               </Text>
               <IconM name="refresh" size={20} />
             </View>

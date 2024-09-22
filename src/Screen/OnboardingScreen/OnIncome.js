@@ -21,9 +21,11 @@ import Modal from "react-native-modal";
 
 const OnIncome = () => {
   const [isModalVisible, setModalVisible] = useState(false);
+  const [DeleteModal, setDeleteModal] = useState(false);
   const Dispatch = useDispatch();
   const GetIncome = useSelector(state => state.Planner.IncomeSlice);
   const [fields, setFields] = useState([]);
+  const [Holdfields, setHoldFields] = useState();
   const Navigation = useNavigation();
 
   useEffect(() => {
@@ -82,13 +84,63 @@ const OnIncome = () => {
     }
   };
 
+  const DeleteEss = data => {
+    console.log(data);
+    // Dispatch(DeletePlannerSlices(data))
+    // const DeleteId = fields.filter((elem,i) => elem.id !== data.id)
+    // const gotlength = getSMSData.filter(
+    //   (elem, i) => elem.relation === data.name && elem.Budget === data.Budget,
+    // );
+    setDeleteModal(true);
+    // console.log(gotlength.length);
+    //setFields(DeleteId)
+    setHoldFields(data)
+  };
+
+  const ConfirmDelete = () =>{
+    const DeleteId = fields.filter((elem,i) => elem.id !== Holdfields.id)
+    setFields(DeleteId)
+    setDeleteModal(false)
+  }
+
+
   return (
     <View style={{flex: 1, backgroundColor: '#fff'}}>
      <Modal isVisible={isModalVisible} onBackdropPress = {()=> setModalVisible(false)}>
         <View style={{backgroundColor:"#fff",padding:20}}>
           <Text style={{textAlign:"center"}}>Income CanNot be Zero Or Negative</Text>
         </View>
-      </Modal>      
+      </Modal>  
+
+      <Modal
+        isVisible={DeleteModal}
+        onBackdropPress={() => setDeleteModal(false)}>
+        <View style={{backgroundColor: '#fff', padding: 20}}>
+          <Text style={{textAlign: 'center'}}>
+             Are You Sure You want to delete 
+          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}>
+            <TouchableOpacity onPress={() => setDeleteModal(false)}>
+              <Text>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => ConfirmDelete()}
+              style={{
+                backgroundColor: 'red',
+                paddingHorizontal: 20,
+                paddingVertical: 8,
+              }}>
+              <Text style={{color: '#fff'}}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
       <View
         style={{
           flexDirection: 'row',
@@ -176,7 +228,7 @@ const OnIncome = () => {
                 paddingHorizontal: 16,
               }}>
               <View style={{flexDirection:"row",justifyContent:"center",alignItems:"center"}}>
-                <TouchableOpacity onPress={() => console.log('noob')}>
+                <TouchableOpacity onPress={() => (elem.DeleteBtn ? DeleteEss(elem) : null)}>
                   <IconMC name="minus-circle" color={elem.DeleteBtn?"#a50000":"#f3bebe"} size={18} />
                 </TouchableOpacity>
                 <TextInput
@@ -214,9 +266,6 @@ const OnIncome = () => {
               }}>
               + Add More
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => console.log(fields)}>
-            <Text>Check</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

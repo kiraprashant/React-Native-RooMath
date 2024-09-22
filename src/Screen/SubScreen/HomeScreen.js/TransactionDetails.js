@@ -83,9 +83,13 @@ const TransactionDetails = () => {
   const [Year, setYear] = useState(
     isUpdateMode ? route.params.smsData.Year : '',
   );
-  const [relation, setrelation] = useState(
-    isUpdateMode ? route.params.smsData.relation : '',
+  const [relationName, setrelationName] = useState(
+    isUpdateMode ? route.params.smsData.relation.Name : '',
   );
+  const [relationId, setrelationId] = useState(
+    isUpdateMode ? route.params.smsData.relation.id : '',
+  );
+
   const [BudgetOption, setBudgetOption] = useState(false);
 
   const [IconSet, setIconSet] = useState(
@@ -101,9 +105,10 @@ const TransactionDetails = () => {
   console.log("........./////////............ mic testing",GetIcon[0])
 
 
-  const SelectedFunction = data => {
-    console.log(data);
-    setrelation(data);
+  const SelectedFunction = (Name,Id) => {
+    console.log(Name,Id);
+    setrelationName(Name);
+    setrelationId(Id)
   };
 
   const GoBack = () =>{
@@ -119,7 +124,8 @@ const TransactionDetails = () => {
 
   const BudgetForNope = (data) =>{
     if(data === "Nope"){
-      setrelation("")
+      setrelationName("")
+      setrelationId("")
     }
     setselectedBudget(data)
   }
@@ -168,7 +174,11 @@ const TransactionDetails = () => {
       address: 'Me',
       date: `${day} ${months[month]} ${year} at ${hours}:${minutes}`,
       Payment: selectedPayment,
-      relation: relation,
+      relation:{
+        Name:relationName,
+        id:relationId
+      },
+    
       address: 'Me',
       Icon: userIcon,
     };
@@ -200,7 +210,10 @@ const TransactionDetails = () => {
       address: 'Me',
       date: date,
       Payment: selectedPayment,
-      relation: relation,
+      relation:{
+        Name:relationName,
+        id:relationId
+      } ,
       address: 'Me',
       Icon: userIcon,
     };
@@ -324,7 +337,7 @@ const TransactionDetails = () => {
                   borderRadius: 8,
                   borderColor: '#e4e4e4',
                 }}>
-                <Text>{relation?relation:"Select One"}</Text>
+                <Text>{relationName?relationName:"Select One"}</Text>
               </TouchableOpacity>
               {BudgetOption ? (
                 <View style={{marginTop: 12}}>

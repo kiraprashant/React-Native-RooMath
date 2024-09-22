@@ -11,7 +11,7 @@ const PAList = ({data,GetEssentialFunction}) => {
   console.log(data)
   useEffect(() => {
     const GetActual = getSMS.reduce((acc,elem) => {
-      if((elem.Budget === data.Budget) && (elem.relation === data.name) ){
+      if((elem.Budget === data.Budget) && (elem.relation.id === data.id) ){
          return acc + parseInt(elem.RS) 
       }
       else{
@@ -25,7 +25,7 @@ const PAList = ({data,GetEssentialFunction}) => {
   
   return (
     <TouchableOpacity
-      onPress={() =>GetEssentialFunction(StateActual,StatePlanned,data.name)}
+      onPress={() =>GetEssentialFunction(StateActual,StatePlanned,data.name,data.id)}
       style={{
         borderWidth: 1,
         borderColor: '#f1f6ff',
